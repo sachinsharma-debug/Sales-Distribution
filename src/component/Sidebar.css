@@ -1,0 +1,44 @@
+styles\Sidebar.css
+.sidebar {
+  width: 60px;
+  transition: width 0.3s ease;
+  background-color: #2e3b55;
+  height: 100vh;
+  padding-top: 20px;
+  color: white;
+  position: fixed;
+}
+
+.sidebar:hover {
+  width: 180px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #fff;
+}
+
+.sidebar-item:hover {
+  background-color: #405075;
+}
+
+.sidebar-icon {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.sidebar-label {
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar:hover .sidebar-label {
+  opacity: 1;
+}
+
+

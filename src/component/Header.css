@@ -1,0 +1,57 @@
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 10px 20px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.left, .center, .right {
+  display: flex;
+  align-items: center;
+}
+
+.left .logo {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.left .dropdown {
+  margin-left: 5px;
+}
+
+.center {
+  flex-direction: column;
+  text-align: center;
+}
+
+.right span {
+  margin: 0 8px;
+  cursor: pointer;
+}
+
+.user-avatar {
+  background: #ccc;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 5px;
+}
+.user-avatar::after{
+    display: none;
+}
+
+
+
+
+
+
+
+
+

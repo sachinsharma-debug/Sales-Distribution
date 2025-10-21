@@ -55,6 +55,10 @@ import Locations from "./pages/Accounts/Locations";
 import InsuranceType from "./pages/Accounts/InsuranceType";
 import ServiceType from "./pages/Accounts/ServiceType";
 import FaLedger from "./pages/Accounts/FaLedger";
+import Sales from "./pages/Sales/Sales";
+import Customer from "./pages/Sales/Customer";
+import Purchase from "./pages/Puchase/Purchase";
+import Vendor from "./pages/Puchase/Vendor";
 
 // Main layout component that includes Sidebar and Header
 const AppLayout = () => {
@@ -123,6 +127,10 @@ function App() {
           <Route path="/salesEnquiry" element={<SalesEnquiry />} />
           <Route path="/SalesQuotation" element={<SalesQuotation />} />
           <Route path="/PurchaseEnquiry" element={<PurchaseEnquiry />} />
+          <Route path="/Sales" element={<Sales />} />
+          <Route path="/Customer" element={<Customer />} />
+          <Route path="/Purchase" element={<Purchase />} />
+          <Route path="/Vendor" element={<Vendor />} />
 
           {/* Add other protected routes here */}
         </Route>

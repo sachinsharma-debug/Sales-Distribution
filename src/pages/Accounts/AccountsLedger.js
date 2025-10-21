@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../Settings/Companies.css";
 import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
-const CustomStyles  = {
+const CustomStyles = {
   content: {
     top: '50%',
     left: '50%',
@@ -13,6 +13,72 @@ const CustomStyles  = {
   },
 };
 const AccountsLedger = () => {
+
+  const [expandedGroups, setExpandedGroups] = useState(new Set(['Account Groups']));
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const accountStructure = [
+    {
+      name: "Account Groups",
+      expanded: true,
+      subGroups: [
+        {
+          name: "Assets",
+          subGroups: [
+            "Current Assets",
+            "Fixed Assets", 
+            "Investments",
+            "Misc. Expenses (ASSET)"
+          ]
+        },
+        {
+          name: "Expenses",
+          subGroups: [
+            "Direct Expenses",
+            "Indirect Expenses",
+            "Purchase Accounts"
+          ]
+        },
+        {
+          name: "Incomes", 
+          subGroups: [
+            "Direct Incomes",
+            "Indirect Incomes", 
+            "Sales Accounts"
+          ]
+        },
+        {
+          name: "Liabilities",
+          subGroups: []
+        }
+      ]
+    }
+  ];
+
+  const toggleGroup = (groupName) => {
+    const newExpandedGroups = new Set(expandedGroups);
+    if (newExpandedGroups.has(groupName)) {
+      newExpandedGroups.delete(groupName);
+    } else {
+      newExpandedGroups.add(groupName);
+    }
+    setExpandedGroups(newExpandedGroups);
+  };
+
+  const expandAll = () => {
+    const allGroups = new Set();
+    allGroups.add('Account Groups');
+    accountStructure[0].subGroups.forEach(group => {
+      allGroups.add(group.name);
+    });
+    setExpandedGroups(allGroups);
+  };
+
+  const collapseAll = () => {
+    setExpandedGroups(new Set(['Account Groups']));
+  };
+
+
   // Search filters state
   const [searchFilters, setSearchFilters] = useState({
     name: "",
@@ -208,7 +274,7 @@ const AccountsLedger = () => {
         .includes(searchFilters.website.toLowerCase())
     );
   });
-let subtitle;
+  let subtitle;
   const [modalIsOpen, setIsOpen] = React.useState(false);
 
   function openModal() {
@@ -225,20 +291,20 @@ let subtitle;
   }
   return (
     <>
-    <Modal
-      isOpen={modalIsOpen}
-      onAfterOpen={afterOpenModal}
-      onRequestClose={closeModal}
-      style={{CustomStyles}}
-      contentLabel="Example Modal"
-    >
-      <div className="d-flex justify-content-between  pb-2" style={{borderBottom: '1px solid #eee'}}>
-        <div style={{fontSize:20}}>Add New Company</div>
-        <div className="my-auto">
-          <button type="submit" className="btn btn-primary">Add</button>
+      <Modal
+        isOpen={modalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={{ CustomStyles }}
+        contentLabel="Example Modal"
+      >
+        <div className="d-flex justify-content-between  pb-2" style={{ borderBottom: '1px solid #eee' }}>
+          <div style={{ fontSize: 20 }}>Add New Company</div>
+          <div className="my-auto">
+            <button type="submit" className="btn btn-primary">Add</button>
+          </div>
         </div>
-      </div>
-      {/* <form className="mt-2  company-form" style={{maxHeight: '500px'}}>
+        {/* <form className="mt-2  company-form" style={{maxHeight: '500px'}}>
         <div className="row">
           <div className="col-8" style={{borderRight: '1px solid #eee'}}>
             <div className="mt-3 row">
@@ -435,8 +501,8 @@ let subtitle;
         </div>
       </form> */}
 
-    </Modal>
-    
+      </Modal>
+
       <div>
         <div className="companies-page">
           <div className="companies-header">
@@ -444,113 +510,200 @@ let subtitle;
             <button onClick={openModal} className="btn btn-primary new-btn">Add Account</button>
           </div>
           <div className="row">
-          <div className="col-8">
-            <div className="pagination-container">
-              <div className="entries-info">
-                <select className="entries-select">
-                  <option value="15">15</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                </select>
-                <span>entries per page</span>
+            <div className="col-8">
+              <div className="pagination-container">
+                <div className="entries-info">
+                  <select className="entries-select">
+                    <option value="15">15</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                  <span>entries per page</span>
+                </div>
+                <div className="pagination-info">
+                  Showing 1 to {filteredCompanies.length} of {filteredCompanies.length}{" "}
+                  entries
+                  {filteredCompanies.length !== companiesData.length && (
+                    <span className="filtered-text">
+                      {" "}
+                      (filtered from {companiesData.length} total entries)
+                    </span>
+                  )}
+                </div>
+                <div className="pagination">
+                  <button className="page-btn active">1</button>
+                  <button className="page-btn">2</button>
+                  <button className="page-btn">›</button>
+                  <button className="page-btn">»</button>
+                </div>
               </div>
-              <div className="pagination-info">
-                Showing 1 to {filteredCompanies.length} of {filteredCompanies.length}{" "}
-                entries
-                {filteredCompanies.length !== companiesData.length && (
-                  <span className="filtered-text">
-                    {" "}
-                    (filtered from {companiesData.length} total entries)
-                  </span>
-                )}
-              </div>
-              <div className="pagination">
-                <button className="page-btn active">1</button>
-                <button className="page-btn">2</button>
-                <button className="page-btn">›</button>
-                <button className="page-btn">»</button>
-              </div>
-            </div>
-            <div className="companies-table-container">
-              <table className="companies-table">
-                <thead>
-                  <tr>
-                    <th>
-                      Code
-                    </th>
-                    <th>
-                      Name
-                    </th>
-                    <th>
-                      Parent Group
-                    </th>
-                    <th>
-                      Approval Status
-                    </th>
-                  </tr>
-                  <tr className="search-row">
-                    <th>
-                      <input
-                        type="text"
-                        className="search-input"
-                        placeholder="Search name..."
-                        value={searchFilters.name}
-                        onChange={(e) => handleSearchChange("name", e.target.value)}
-                      />
-                    </th>
-                    <th>
-                      <input
-                        type="text"
-                        className="search-input"
-                        placeholder="Search parent..."
-                        value={searchFilters.parentName}
-                        onChange={(e) =>
-                          handleSearchChange("parentName", e.target.value)
-                        }
-                      />
-                    </th>
-                    <th>
-                      <input
-                        type="text"
-                        className="search-input"
-                        placeholder="Search address..."
-                        value={searchFilters.address}
-                        onChange={(e) =>
-                          handleSearchChange("address", e.target.value)
-                        }
-                      />
-                    </th>
-                    <th>
-                      <input
-                        type="text"
-                        className="search-input"
-                        placeholder="Search phone..."
-                        value={searchFilters.phone}
-                        onChange={(e) => handleSearchChange("phone", e.target.value)}
-                      />
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredCompanies.map((company) => (
-                    <tr key={company.id}>
-                      <td>{company.name}</td>
-                      <td>{company.parentName}</td>
-                      <td>{company.address}</td>
-                      <td>{company.phone}</td>
-                      
+              <div className="companies-table-container">
+                <table className="companies-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        Code
+                      </th>
+                      <th>
+                        Name
+                      </th>
+                      <th>
+                        Parent Group
+                      </th>
+                      <th>
+                        Approval Status
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                    <tr className="search-row">
+                      <th>
+                        <input
+                          type="text"
+                          className="search-input"
+                          placeholder="Search name..."
+                          value={searchFilters.name}
+                          onChange={(e) => handleSearchChange("name", e.target.value)}
+                        />
+                      </th>
+                      <th>
+                        <input
+                          type="text"
+                          className="search-input"
+                          placeholder="Search parent..."
+                          value={searchFilters.parentName}
+                          onChange={(e) =>
+                            handleSearchChange("parentName", e.target.value)
+                          }
+                        />
+                      </th>
+                      <th>
+                        <input
+                          type="text"
+                          className="search-input"
+                          placeholder="Search address..."
+                          value={searchFilters.address}
+                          onChange={(e) =>
+                            handleSearchChange("address", e.target.value)
+                          }
+                        />
+                      </th>
+                      <th>
+                        <input
+                          type="text"
+                          className="search-input"
+                          placeholder="Search phone..."
+                          value={searchFilters.phone}
+                          onChange={(e) => handleSearchChange("phone", e.target.value)}
+                        />
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCompanies.map((company) => (
+                      <tr key={company.id}>
+                        <td>{company.name}</td>
+                        <td>{company.parentName}</td>
+                        <td>{company.address}</td>
+                        <td>{company.phone}</td>
+
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-          <div className="col-4">
-            <div className="bg-white px-3 py-2" style={{fontSize:14,color:'#6c757d'}}>Chart Of Accounts</div>
+            <div className="col-4">
+              <div className="chart-of-accounts">
+                <div className="header">
+                  <div className="header-top">
+                    <h2>Chart of Accounts</h2><br/>
+                    <div className="search-container">
+                    {/* <div className="search-icon">🔍</div> */}
+                    <input
+                      type="text"
+                      placeholder="Search accounts..."
+                      className="search-input"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                    <div className="button-group">
+                      <button className="btn btn-outline" onClick={collapseAll}>
+                        <span className="btn-icon">−</span>
+                        Collapse All
+                      </button>
+                      <button className="btn btn-primary" onClick={expandAll}>
+                        <span className="btn-icon">+</span>
+                        Expand All
+                      </button>
+                    </div>
+                  </div>
+
+                  
+                </div>
+
+                <div className="accounts-tree">
+                  <div className="tree-container">
+                    <ul className="tree-list">
+                      {accountStructure.map((mainGroup) => (
+                        <li key={mainGroup.name} className="tree-item main-group">
+                          <div
+                            className={`group-header main-header ${expandedGroups.has(mainGroup.name) ? 'expanded' : ''}`}
+                            onClick={() => toggleGroup(mainGroup.name)}
+                          >
+                            <span className="expand-icon">
+                              {mainGroup.subGroups.length > 0 && (
+                                expandedGroups.has(mainGroup.name) ? '🔽' : '▶️'
+                              )}
+                            </span>
+                            <span className="group-name">
+                              {/* <span className="group-number">1</span> */}
+                              {mainGroup.name}
+                            </span>
+                          </div>
+
+                          {mainGroup.subGroups.length > 0 && expandedGroups.has(mainGroup.name) && (
+                            <ul className="subgroup-list">
+                              {mainGroup.subGroups.map((group) => (
+                                <li key={group.name} className="subgroup-item group-item">
+                                  <div
+                                    className={`subgroup-header ${expandedGroups.has(group.name) ? 'expanded' : ''}`}
+                                    onClick={() => toggleGroup(group.name)}
+                                  >
+                                    <span className="expand-icon">
+                                      {group.subGroups.length > 0 && (
+                                        expandedGroups.has(group.name) ? '🔽' : '▶️'
+                                      )}
+                                    </span>
+                                    <span className="group-name">{group.name}</span>
+                                    <span className="item-count">{group.subGroups.length}</span>
+                                  </div>
+
+                                  {group.subGroups.length > 0 && expandedGroups.has(group.name) && (
+                                    <ul className="sub-subgroup-list">
+                                      {group.subGroups.map((subGroup) => (
+                                        <li key={subGroup} className="sub-subgroup-item">
+                                          <div className="subgroup-content">
+                                            <span className="bullet">•</span>
+                                            {subGroup}
+                                          </div>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 };

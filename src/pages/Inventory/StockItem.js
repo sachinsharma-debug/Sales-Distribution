@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import "../Settings/Companies.css";
-import ReactDOM from 'react-dom';
-
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import { Tabs, Tab, Box } from "@mui/material";
+// ...existing code...
 const StockItem = () => {
   // Search filters state
   const [searchFilters, setSearchFilters] = useState({
@@ -14,11 +18,6 @@ const StockItem = () => {
     website: "",
   });
 
-  // Dialog state
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("basic");
-  const [maintainInBatches, setMaintainInBatches] = useState(false);
-
   // Handle search filter changes
   const handleSearchChange = (field, value) => {
     setSearchFilters((prev) => ({
@@ -26,12 +25,6 @@ const StockItem = () => {
       [field]: value,
     }));
   };
-
-  // Handle toggle change
-  const handleToggleChange = (e) => {
-    setMaintainInBatches(e.target.checked);
-  };
-
   // Sample companies data
   const companiesData = [
     {
@@ -76,386 +69,1155 @@ const StockItem = () => {
         .includes(searchFilters.website.toLowerCase())
     );
   });
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [maintainBatches, setMaintainBatches] = useState("No");
+  const [assemblyStepsDialog, setAssemblyStepsDialog] = useState(false);
+  const [assemblySteps, setAssemblySteps] = useState([
+    { id: 1, process: "Assembling", subProcess: "", cycleTimeMinutes: "0" },
+  ]);
+  const [bomDialogOpen, setBomDialogOpen] = useState(false);
+  const [bomName, setBomName] = useState("");
+  // Basic tab - Stock Name for referencing in BOM config
+  const [stockName, setStockName] = useState("");
 
-  // Dialog functions
-  const openDialog = () => {
+  // BOM configuration dialog (after entering BOM name)
+  const [bomConfigOpen, setBomConfigOpen] = useState(false);
+  const [bomConfig, setBomConfig] = useState({
+    unitToProduce: 0,
+    wastageDetails: "No",
+    additionalExpense: "No",
+    unitOfManufacture: "",
+  });
+  const [bomItems, setBomItems] = useState([
+    {
+      id: 1,
+      process: "",
+      item: "",
+      godown: "",
+      subType: "",
+      quantity: "",
+      wastageDetails: "No",
+      budgetRate: "",
+      vendorName: "",
+    },
+  ]);
+
+  // Wastage details dialog
+  const [wastageDialogOpen, setWastageDialogOpen] = useState(false);
+  const [wastageInfo, setWastageInfo] = useState({
+    unitToProduce: 0,
+  });
+  const [wastageItems, setWastageItems] = useState([
+    {
+      id: 1,
+      slNo: 1,
+      description: "Wastage",
+      percentage: "",
+      value: "",
+      balance: "1.00",
+    },
+  ]);
+
+  const addWastageItem = () => {
+    setWastageItems((prev) => [
+      ...prev,
+      {
+        id: prev.length ? Math.max(...prev.map((r) => r.id)) + 1 : 1,
+        slNo: prev.length + 1,
+        description: "",
+        percentage: "",
+        value: "",
+        balance: "",
+      },
+    ]);
+  };
+
+  const updateWastageItem = (id, field, value) => {
+    setWastageItems((rows) =>
+      rows.map((r) => (r.id === id ? { ...r, [field]: value } : r))
+    );
+  };
+
+  const deleteWastageItem = (id) => {
+    setWastageItems((rows) => rows.filter((r) => r.id !== id));
+  };
+
+  // Additional expense dialog
+  const [additionalExpenseDialogOpen, setAdditionalExpenseDialogOpen] =
+    useState(false);
+  const [additionalExpenseItems, setAdditionalExpenseItems] = useState([
+    {
+      id: 1,
+      slNo: 1,
+      description: "Samples",
+      expenseType: "Samples",
+      unit: "",
+      uom: "",
+      rate: "",
+      amount: "",
+    },
+  ]);
+
+  const addAdditionalExpenseItem = () => {
+    setAdditionalExpenseItems((prev) => [
+      ...prev,
+      {
+        id: prev.length ? Math.max(...prev.map((r) => r.id)) + 1 : 1,
+        slNo: prev.length + 1,
+        description: "",
+        expenseType: "",
+        unit: "",
+        uom: "",
+        rate: "",
+        amount: "",
+      },
+    ]);
+  };
+
+  const updateAdditionalExpenseItem = (id, field, value) => {
+    setAdditionalExpenseItems((rows) =>
+      rows.map((r) => (r.id === id ? { ...r, [field]: value } : r))
+    );
+  };
+
+  const deleteAdditionalExpenseItem = (id) => {
+    setAdditionalExpenseItems((rows) => rows.filter((r) => r.id !== id));
+  };
+
+  const addBomItem = () => {
+    setBomItems((prev) => [
+      ...prev,
+      {
+        id: prev.length ? Math.max(...prev.map((r) => r.id)) + 1 : 1,
+        process: "",
+        item: "",
+        godown: "",
+        subType: "",
+        quantity: "",
+        wastageDetails: "No",
+        budgetRate: "",
+        vendorName: "",
+      },
+    ]);
+  };
+
+  const updateBomItem = (id, field, value) => {
+    setBomItems((rows) =>
+      rows.map((r) => (r.id === id ? { ...r, [field]: value } : r))
+    );
+  };
+
+  const deleteBomItem = (id) => {
+    setBomItems((rows) => rows.filter((r) => r.id !== id));
+  };
+
+  function openDialog() {
     setDialogOpen(true);
-    setActiveTab("basic");
-    setMaintainInBatches(false); // Reset toggle when dialog opens
-  };
+  }
 
-  const closeDialog = () => {
+  function closeDialog() {
     setDialogOpen(false);
+  }
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add your form submission logic here
-    closeDialog();
-  };
-
-  // Render form fields based on active tab
-  const renderFormFields = () => {
-    switch (activeTab) {
-      case "basic":
-        return (
-          <div className="row">
-            <div className="col-5 my-auto">
-              <label htmlFor="MasterID" className="form-label">Master ID</label>
-            </div>
-            <div className="col-7">
-              <input type="text" className="form-control" id="MasterID" />
-            </div>
-            <div className="col-5 my-auto">
-              <label htmlFor="AlterID" className="form-label">Alter ID</label>
-            </div>
-            <div className="col-7">
-              <input type="text" className="form-control" id="AlterID" />
-            </div>
-
-            <div className="col-5 my-auto">
-              <label htmlFor="groupName" className="form-label">Group Name</label>
-            </div>
-            <div className="col-7">
-              <select id="groupName" className="form-select w-100">
-                <option>Primary</option>
-              </select>
-            </div>
-
-            <div className="col-5 my-auto">
-              <label htmlFor="itemName" className="form-label">Name</label>
-            </div>
-            <div className="col-7">
-              <input type="text" className="form-control" id="itemName" />
-            </div>
-
-            <div className="col-5 my-auto">
-              <label htmlFor="under" className="form-label">Under</label>
-            </div>
-            <div className="col-7">
-              <select id="under" className="form-select w-100">
-                <option>Primary</option>
-              </select>
-            </div>
-
-            <div className="col-5 my-auto">
-              <label htmlFor="units" className="form-label">Units</label>
-            </div>
-            <div className="col-7">
-              <select id="units" className="form-select w-100">
-                <option>Primary</option>
-              </select>
-            </div>
-
-            <div className="col-5 my-auto">
-              <label htmlFor="alternateUnits" className="form-label">Alternate Units</label>
-            </div>
-            <div className="col-7">
-              <select id="alternateUnits" className="form-select w-100">
-                <option>Primary</option>
-              </select>
-            </div>
-          </div>
-        );
-
-      case "additional":
-        return (
-          <div className="row">
-            <div className="col-5 my-auto">
-              <label htmlFor="maintainInBatches" className="form-label">Maintain in batches</label>
-            </div>
-            <div className="col-7">
-              <div className="form-check form-switch">
-                <input 
-                  className="form-check-input" 
-                  type="checkbox" 
-                  role="switch" 
-                  id="maintainInBatches" 
-                  checked={maintainInBatches}
-                  onChange={handleToggleChange}
-                />
-              </div>
-            </div>
-
-            {/* Conditionally render these fields based on toggle state */}
-            {maintainInBatches && (
-              <>
-                
-                <div className="col-5 my-auto" style={{paddingLeft:30}}>
-                  <label htmlFor="trackManufacturingDate" className="form-label">Track date of manufacturing</label>
-                </div>
-                <div className="col-7">
-                  <select id="trackManufacturingDate" className="form-select w-100">
-                    <option>No</option>
-                    <option>Yes</option>
-                  </select>
-                </div>
-
-                <div className="col-5 my-auto" style={{paddingLeft:30}}>
-                  <label htmlFor="useExpiryDates" className="form-label">Use expiry dates</label>
-                </div>
-                <div className="col-7">
-                  <select id="useExpiryDates" className="form-select w-100">
-                    <option>No</option>
-                    <option>Yes</option>
-                  </select>
-                </div>
-              </>
-            )}
-
-            <div className="col-5 my-auto">
-              <label htmlFor="alterComponents" className="form-label">Alter components (BOM)</label>
-            </div>
-            <div className="col-7">
-              <select id="alterComponents" className="form-select w-100">
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-            </div>
-
-            <div className="col-5 my-auto">
-              <label htmlFor="setAssemblySteps" className="form-label">Set/Alter assembly steps</label>
-            </div>
-            <div className="col-7">
-              <select id="setAssemblySteps" className="form-select w-100">
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-            </div>
-
-            <div className="col-5 my-auto">
-              <label htmlFor="alterStandardRates" className="form-label">Alter standard rates</label>
-            </div>
-            <div className="col-7">
-              <select id="alterStandardRates" className="form-select w-100">
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-            </div>
-
-            <div className="col-5 my-auto">
-              <label htmlFor="enableCostTracking" className="form-label">Enable cost tracking</label>
-            </div>
-            <div className="col-7">
-              <select id="enableCostTracking" className="form-select w-100">
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-            </div>
-
-            <div className="col-5 my-auto">
-              <label htmlFor="costingMethod" className="form-label">Costing method</label>
-            </div>
-            <div className="col-7">
-              <select id="costingMethod" className="form-select w-100">
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-            </div>
-
-            <div className="col-5 my-auto">
-              <label htmlFor="marketValuationMethod" className="form-label">Market valuation method</label>
-            </div>
-            <div className="col-7">
-              <select id="marketValuationMethod" className="form-select w-100">
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-            </div>
-          </div>
-        );
-
-      case "statutory":
-        return (
-          <>
-            <div className="row">
-              <div className="col-5 my-auto">
-                <label htmlFor="gstApplicability" className="form-label">GST applicability</label>
-              </div>
-              <div className="col-7">
-                <select id="gstApplicability" className="form-select w-100">
-                  <option>Applicable</option>
-                  <option>Not Applicable</option>
-                </select>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-12 bg-light py-1 my-2 text-center">HSN/SAC</div>
-              <div className="col-5 my-auto">
-                <label htmlFor="hsnDetails" className="form-label">HSN/SAC details</label>
-              </div>
-              <div className="col-7">
-                <select id="hsnDetails" className="form-select w-100">
-                  <option>As per company/stock group</option>
-                  <option>Specify details here</option>
-                  <option>Use gst classification</option>
-                </select>
-              </div>
-
-              <div className="col-5 my-auto">
-                <label htmlFor="hsnCode" className="form-label">HSN/SAC</label>
-              </div>
-              <div className="col-7">
-                <input type="text" className="form-control" id="hsnCode" />
-              </div>
-
-              <div className="col-5 my-auto">
-                <label htmlFor="description" className="form-label">Description</label>
-              </div>
-              <div className="col-7">
-                <textarea type="text" className="form-control" id="description" />
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-12 bg-light py-1 my-2 text-center">GST Rate</div>
-              <div className="col-5 my-auto">
-                <label htmlFor="gstRateDetails" className="form-label">GST rate details</label>
-              </div>
-              <div className="col-7">
-                <select id="gstRateDetails" className="form-select w-100">
-                  <option>As per company/stock group</option>
-                  <option>Specify details here</option>
-                  <option>Use gst classification</option>
-                </select>
-              </div>
-
-              <div className="col-5 my-auto">
-                <label htmlFor="taxabilityType" className="form-label">Taxability type</label>
-              </div>
-              <div className="col-7">
-                <select id="taxabilityType" className="form-select w-100">
-                  <option>Exempt</option>
-                  <option>Nil rated</option>
-                  <option>Non gst</option>
-                  <option>Taxable</option>
-                </select>
-              </div>
-
-              <div className="col-5 my-auto">
-                <label htmlFor="cgst" className="form-label">GST rate (%)</label>
-              </div>
-              <div className="col-7">
-                <input type="number" className="form-control" id="cgst" step="0.01" />
-              </div>
-
-              <div className="col-5 my-auto">
-                <label htmlFor="typeOfSupply" className="form-label">Type of supply</label>
-              </div>
-              <div className="col-7">
-                <select id="typeOfSupply" className="form-select w-100">
-                  <option>Capital goods</option>
-                  <option>Goods</option>
-                  <option>Services</option>
-                </select>
-              </div>
-
-              <div className="col-5 my-auto">
-                <label htmlFor="reportingUOM" className="form-label">Reporting UOM (UQC)</label>
-              </div>
-              <div className="col-7">
-                <select id="reportingUOM" className="form-select w-100">
-                  <option>NOS</option>
-                  <option>PCS</option>
-                </select>
-              </div>
-
-              <div className="col-5 my-auto">
-                <label htmlFor="alterMrpDetails" className="form-label">Set/Alter mrp details</label>
-              </div>
-              <div className="col-7">
-                <select id="alterMrpDetails" className="form-select w-100">
-                  <option>NO</option>
-                  <option>Yes</option>
-                </select>
-              </div>
-
-              <div className="col-5 my-auto">
-                <label htmlFor="dutyRate" className="form-label">Rate of duty (eg 5)</label>
-              </div>
-              <div className="col-7">
-                <input type="text" className="form-control" id="dutyRate" />
-              </div>
-            </div>
-          </>
-        );
-
-      default:
-        return null;
+  const handleAssemblyStepsChange = (value) => {
+    if (value === "Yes") {
+      setAssemblyStepsDialog(true);
     }
   };
 
+  const addAssemblyStep = () => {
+    const newStep = {
+      id: assemblySteps.length + 1,
+      process: "",
+      subProcess: "",
+      cycleTimeMinutes: "0",
+    };
+    setAssemblySteps([...assemblySteps, newStep]);
+  };
+
+  const updateAssemblyStep = (id, field, value) => {
+    setAssemblySteps(
+      assemblySteps.map((step) =>
+        step.id === id ? { ...step, [field]: value } : step
+      )
+    );
+  };
+
+  const deleteAssemblyStep = (id) => {
+    setAssemblySteps(assemblySteps.filter((step) => step.id !== id));
+  };
+
+  // Prevent form submit default and close dialog on Add
+  const handleDialogAdd = (e) => {
+    e.preventDefault();
+    // Add logic here if needed
+    closeDialog();
+  };
   return (
     <>
-      {/* Dialog */}
-      {dialogOpen && (
-        <div className="dialog-overlay">
-          <div className="dialog-content stock-item-dialog">
-            <div className="pb-2" style={{ borderBottom: '1px solid #eee' }}>
-              <div style={{ fontSize: 20 }}>Add Stock Item</div>
-            </div>
-            <form id="stockItemForm" className="company-form" style={{ maxHeight: '500px' }} onSubmit={handleSubmit}>
-              <div className="row">
-                <div className="col-12">
-                  <div className="mt-3 row">
-                    <div className="col-10" style={{ borderRight: '1px solid #e9e9e9ff' }}>
-                      <div className="row">
-                        {renderFormFields()}
+      <Dialog open={dialogOpen} onClose={closeDialog} maxWidth="md" fullWidth>
+        <DialogTitle>Add Stock Item</DialogTitle>
+        <DialogContent>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              aria-label="stock item tabs"
+            >
+              <Tab label="Basic Details" />
+              <Tab label="Additional Details" />
+            </Tabs>
+          </Box>
+
+          {/* Basic Details Tab */}
+          {activeTab === 0 && (
+            <Box sx={{ pt: 2 }}>
+              <form
+                className="company-form"
+                style={{ maxHeight: "500px" }}
+                onSubmit={handleDialogAdd}
+              >
+                <div className="row">
+                  <div className="col-12">
+                    <div className="mt-3 row">
+                      <div className="col-4 my-auto">
+                        <label htmlFor="MasterID" className="form-label">
+                          Master ID
+                        </label>
                       </div>
-                    </div>
-                    <div className="col-2">
-                      <div
-                        className={`py-1 px-2 text-xs ${activeTab === "basic" ? "active-tab" : ""}`}
-                        style={{ borderBottom: '1px solid #e9e9e9ff', cursor: 'pointer' }}
-                        onClick={() => setActiveTab("basic")}
-                      >
-                        Basic
+                      <div className="col-8">
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="MasterID"
+                        />
                       </div>
-                      <div
-                        className={`py-1 px-2 text-xs ${activeTab === "additional" ? "active-tab" : ""}`}
-                        style={{ borderBottom: '1px solid #e9e9e9ff', cursor: 'pointer' }}
-                        onClick={() => setActiveTab("additional")}
-                      >
-                        Additional
+                      <div className="col-4 my-auto">
+                        <label htmlFor="AlterID" className="form-label">
+                          Alter ID
+                        </label>
                       </div>
-                      <div
-                        className={`py-1 px-2 text-xs ${activeTab === "statutory" ? "active-tab" : ""}`}
-                        style={{ borderBottom: '1px solid #e9e9e9ff', cursor: 'pointer' }}
-                        onClick={() => setActiveTab("statutory")}
-                      >
-                        Statutory
+                      <div className="col-8">
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="AlterID"
+                        />
+                      </div>
+
+                      <div className="col-4 my-auto">
+                        <label htmlFor="GroupName" className="form-label">
+                          Group Name
+                        </label>
+                      </div>
+                      <div className="col-8">
+                        <select id="GroupName" className="form-select w-100">
+                          <option>Primary</option>
+                        </select>
+                      </div>
+
+                      <div className="col-4 my-auto">
+                        <label htmlFor="StockName" className="form-label">
+                          Name
+                        </label>
+                      </div>
+                      <div className="col-8">
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="StockName"
+                          value={stockName}
+                          onChange={(e) => setStockName(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="col-4 my-auto">
+                        <label htmlFor="Under" className="form-label">
+                          Under
+                        </label>
+                      </div>
+                      <div className="col-8">
+                        <select id="Under" className="form-select w-100">
+                          <option>Primary</option>
+                        </select>
+                      </div>
+
+                      <div className="col-4 my-auto">
+                        <label htmlFor="Units" className="form-label">
+                          Units
+                        </label>
+                      </div>
+                      <div className="col-8">
+                        <select id="Units" className="form-select w-100">
+                          <option>Primary</option>
+                        </select>
+                      </div>
+
+                      <div className="col-4 my-auto">
+                        <label htmlFor="AlternateUnits" className="form-label">
+                          Alternate Units
+                        </label>
+                      </div>
+                      <div className="col-8">
+                        <select
+                          id="AlternateUnits"
+                          className="form-select w-100"
+                        >
+                          <option>Primary</option>
+                        </select>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </form>
+              </form>
+            </Box>
+          )}
+
+          {/* Additional Details Tab */}
+          {activeTab === 1 && (
+            <Box sx={{ pt: 2 }}>
+              <form className="company-form" style={{ maxHeight: "500px" }}>
+                <div className="row">
+                  <div className="col-12">
+                    <div className="mt-3 row">
+                      <div className="col-4 my-auto">
+                        <label htmlFor="MaintainBatches" className="form-label">
+                          Maintain in batches
+                        </label>
+                      </div>
+                      <div className="col-8">
+                        <select
+                          id="MaintainBatches"
+                          className="form-select w-100"
+                          value={maintainBatches}
+                          onChange={(e) => setMaintainBatches(e.target.value)}
+                        >
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                        </select>
+                      </div>
+
+                      {maintainBatches === "Yes" && (
+                        <>
+                          <div
+                            className="col-4 my-auto"
+                            style={{ paddingLeft: "30px" }}
+                          >
+                            <label
+                              htmlFor="TrackDateManufacturing"
+                              className="form-label"
+                            >
+                              Track date of manufacturing
+                            </label>
+                          </div>
+                          <div className="col-8">
+                            <select
+                              id="TrackDateManufacturing"
+                              className="form-select w-100"
+                            >
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+
+                          <div
+                            className="col-4 my-auto"
+                            style={{ paddingLeft: "30px" }}
+                          >
+                            <label
+                              htmlFor="UseExpiryDates"
+                              className="form-label"
+                            >
+                              Use expiry dates
+                            </label>
+                          </div>
+                          <div className="col-8">
+                            <select
+                              id="UseExpiryDates"
+                              className="form-select w-100"
+                            >
+                              <option value="No">No</option>
+                              <option value="Yes">Yes</option>
+                            </select>
+                          </div>
+                        </>
+                      )}
+
+                      <div className="col-4 my-auto">
+                        <label
+                          htmlFor="AlterComponentsBOM"
+                          className="form-label"
+                        >
+                          Alter Components (BOM)
+                        </label>
+                      </div>
+                      <div className="col-8">
+                        <select
+                          id="AlterComponentsBOM"
+                          className="form-select w-100"
+                          onChange={(e) => {
+                            if (e.target.value === "Yes")
+                              setBomDialogOpen(true);
+                          }}
+                        >
+                          <option value="No">No</option>
+                          <option value="Yes">Yes</option>
+                        </select>
+                      </div>
+
+                      <div className="col-4 my-auto">
+                        <label
+                          htmlFor="SetAlterAssemblySteps"
+                          className="form-label"
+                        >
+                          Set/Alter Assembly Steps
+                        </label>
+                      </div>
+                      <div className="col-8">
+                        <select
+                          id="SetAlterAssemblySteps"
+                          className="form-select w-100"
+                          onChange={(e) =>
+                            handleAssemblyStepsChange(e.target.value)
+                          }
+                        >
+                          <option value="No">No</option>
+                          <option value="Yes">Yes</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={closeDialog}
+          >
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary" form="">
+            Add
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Assembly Steps Dialog */}
+      <Dialog
+        open={assemblyStepsDialog}
+        onClose={() => setAssemblyStepsDialog(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>Assembly Steps</DialogTitle>
+        <DialogContent>
+          <div className="table-responsive mt-3">
+            <table className="table table-bordered">
+              <thead style={{ backgroundColor: "#b8c5d6" }}>
+                <tr>
+                  <th>Sl No</th>
+                  <th>Process</th>
+                  <th>Sub Process</th>
+                  <th>Cycle Time in Minutes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {assemblySteps.map((step, index) => (
+                  <tr key={step.id}>
+                    <td>{index + 1}</td>
+                    <td>
+                      <input
+                        type="text"
+                        className="form-control form-control-sm"
+                        value={step.process}
+                        onChange={(e) =>
+                          updateAssemblyStep(step.id, "process", e.target.value)
+                        }
+                        style={{
+                          backgroundColor: step.id === 1 ? "#f5d982" : "white",
+                        }}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        className="form-control form-control-sm"
+                        value={step.subProcess}
+                        onChange={(e) =>
+                          updateAssemblyStep(
+                            step.id,
+                            "subProcess",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        className="form-control form-control-sm"
+                        value={step.cycleTimeMinutes}
+                        onChange={(e) =>
+                          updateAssemblyStep(
+                            step.id,
+                            "cycleTimeMinutes",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={() => deleteAssemblyStep(step.id)}
+                        disabled={assemblySteps.length === 1}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-3">
             <button
-              className="dialog-close-btn"
-              onClick={closeDialog}
-              style={{
-                position: 'absolute',
-                top: '10px',
-                right: '10px',
-                background: 'none',
-                border: 'none',
-                fontSize: '20px',
-                cursor: 'pointer'
-              }}
+              type="button"
+              className="btn btn-primary"
+              onClick={addAssemblyStep}
             >
-              ×
+              Add Row
             </button>
-            <hr />
-            <div className="my-auto text-end">
-              <button type="submit" form="stockItemForm" className="btn btn-primary">Add</button>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setAssemblyStepsDialog(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => setAssemblyStepsDialog(false)}
+          >
+            Save
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      {/* BOM Dialog */}
+      <Dialog
+        open={bomDialogOpen}
+        onClose={() => setBomDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>BOM Details</DialogTitle>
+        <DialogContent>
+          <div className="mb-3">
+            <label htmlFor="bomName" className="form-label">
+              Name of BOM
+            </label>
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              id="bomName"
+              value={bomName}
+              onChange={(e) => setBomName(e.target.value)}
+            />
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setBomDialogOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => {
+              setBomDialogOpen(false);
+              setBomConfigOpen(true);
+            }}
+          >
+            Save
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      {/* BOM Configuration Dialog (Components of, table, etc.) */}
+      <Dialog
+        open={bomConfigOpen}
+        onClose={() => setBomConfigOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>Bill of Materials</DialogTitle>
+        <DialogContent>
+          <div className="container-fluid">
+            <div className="row g-2 align-items-center">
+              <div className="col-3 text-end">BoM Name</div>
+              <div className="col-9">
+                <input
+                  type="text"
+                  className="form-control form-control-sm"
+                  value={bomName}
+                  readOnly
+                />
+              </div>
+
+              <div className="col-3 text-end">Components of</div>
+              <div className="col-9">
+                <input
+                  type="text"
+                  className="form-control form-control-sm"
+                  value={stockName}
+                  placeholder=""
+                  readOnly
+                />
+              </div>
+
+              <div className="col-3 text-end">Unit to produce</div>
+              <div className="col-3">
+                <input
+                  type="number"
+                  className="form-control form-control-sm"
+                  value={bomConfig.unitToProduce}
+                  onChange={(e) =>
+                    setBomConfig((c) => ({
+                      ...c,
+                      unitToProduce: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+              <div className="col-6">NOS</div>
+
+              <div className="col-3 text-end">Wastage Details</div>
+              <div className="col-3">
+                <select
+                  className="form-select form-select-sm"
+                  value={bomConfig.wastageDetails}
+                  onChange={(e) => {
+                    setBomConfig((c) => ({
+                      ...c,
+                      wastageDetails: e.target.value,
+                    }));
+                    if (e.target.value === "Yes") {
+                      setWastageDialogOpen(true);
+                    }
+                  }}
+                >
+                  <option value="No">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+              <div className="col-3 text-end">Additional Expense</div>
+              <div className="col-3">
+                <select
+                  className="form-select form-select-sm"
+                  value={bomConfig.additionalExpense}
+                  onChange={(e) => {
+                    setBomConfig((c) => ({
+                      ...c,
+                      additionalExpense: e.target.value,
+                    }));
+                    if (e.target.value === "Yes") {
+                      setAdditionalExpenseDialogOpen(true);
+                    }
+                  }}
+                >
+                  <option value="No">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+
+              <div className="col-3 text-end">Unit of manufacture</div>
+              <div className="col-9">
+                <input
+                  type="text"
+                  className="form-control form-control-sm"
+                  value={bomConfig.unitOfManufacture}
+                  onChange={(e) =>
+                    setBomConfig((c) => ({
+                      ...c,
+                      unitOfManufacture: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="table-responsive mt-3">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "#b8c5d6" }}>
+                  <tr>
+                    <th>Process</th>
+                    <th>Item</th>
+                    <th>Godown</th>
+                    <th>Sub Type</th>
+                    <th>Quantity</th>
+                    <th>Wastage Details</th>
+                    <th>Budget Rate</th>
+                    <th>Vendor Name</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bomItems.map((row) => (
+                    <tr key={row.id}>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.process}
+                          onChange={(e) =>
+                            updateBomItem(row.id, "process", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.item}
+                          onChange={(e) =>
+                            updateBomItem(row.id, "item", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.godown}
+                          onChange={(e) =>
+                            updateBomItem(row.id, "godown", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.subType}
+                          onChange={(e) =>
+                            updateBomItem(row.id, "subType", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          value={row.quantity}
+                          onChange={(e) =>
+                            updateBomItem(row.id, "quantity", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <select
+                          className="form-select form-select-sm"
+                          value={row.wastageDetails}
+                          onChange={(e) =>
+                            updateBomItem(
+                              row.id,
+                              "wastageDetails",
+                              e.target.value
+                            )
+                          }
+                        >
+                          <option value="No">No</option>
+                          <option value="Yes">Yes</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          value={row.budgetRate}
+                          onChange={(e) =>
+                            updateBomItem(row.id, "budgetRate", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.vendorName}
+                          onChange={(e) =>
+                            updateBomItem(row.id, "vendorName", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-sm"
+                          onClick={() => deleteBomItem(row.id)}
+                          disabled={bomItems.length === 1}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-2">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={addBomItem}
+              >
+                Add Row
+              </button>
             </div>
           </div>
-        </div>
-      )}
+        </DialogContent>
+        <DialogActions>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setBomConfigOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => setBomConfigOpen(false)}
+          >
+            Save
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Wastage Details Dialog */}
+      <Dialog
+        open={wastageDialogOpen}
+        onClose={() => setWastageDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>WASTAGE INFO</DialogTitle>
+        <DialogContent>
+          <div className="container-fluid">
+            <div className="row g-2 align-items-center mb-3">
+              <div className="col-4 text-end">Unit to produce</div>
+              <div className="col-2">
+                <input
+                  type="number"
+                  className="form-control form-control-sm"
+                  value={wastageInfo.unitToProduce}
+                  onChange={(e) =>
+                    setWastageInfo((c) => ({
+                      ...c,
+                      unitToProduce: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+              <div className="col-6">NOS</div>
+            </div>
+
+            <div className="table-responsive">
+              <table className="table table-bordered table-sm">
+                <thead style={{ backgroundColor: "#b8c5d6" }}>
+                  <tr>
+                    <th style={{ width: "10%" }}>Sl No</th>
+                    <th style={{ width: "30%" }}>Description</th>
+                    <th style={{ width: "20%" }}>Percentage</th>
+                    <th style={{ width: "20%" }}>Value</th>
+                    <th style={{ width: "20%" }}>Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {wastageItems.map((row) => (
+                    <tr key={row.id}>
+                      <td>{row.slNo}</td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.description}
+                          onChange={(e) =>
+                            updateWastageItem(
+                              row.id,
+                              "description",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          value={row.percentage}
+                          onChange={(e) =>
+                            updateWastageItem(
+                              row.id,
+                              "percentage",
+                              e.target.value
+                            )
+                          }
+                          style={{ backgroundColor: "#f5d982" }}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          value={row.value}
+                          onChange={(e) =>
+                            updateWastageItem(row.id, "value", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.balance}
+                          onChange={(e) =>
+                            updateWastageItem(row.id, "balance", e.target.value)
+                          }
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-2">
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={addWastageItem}
+              >
+                Add Row
+              </button>
+              {wastageItems.length > 1 && (
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm ms-2"
+                  onClick={() =>
+                    deleteWastageItem(wastageItems[wastageItems.length - 1].id)
+                  }
+                >
+                  Delete Row
+                </button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setWastageDialogOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => setWastageDialogOpen(false)}
+          >
+            Save
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Additional Expense Dialog */}
+      <Dialog
+        open={additionalExpenseDialogOpen}
+        onClose={() => setAdditionalExpenseDialogOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>ADDITIONAL EXPENSE</DialogTitle>
+        <DialogContent>
+          <div className="container-fluid">
+            <div className="table-responsive">
+              <table className="table table-bordered table-sm">
+                <thead style={{ backgroundColor: "#b8c5d6" }}>
+                  <tr>
+                    <th style={{ width: "10%" }}>Sl No</th>
+                    <th style={{ width: "20%" }}>Description</th>
+                    <th style={{ width: "20%" }}>Expence Type</th>
+                    <th style={{ width: "15%" }}>Unit</th>
+                    <th style={{ width: "10%" }}>UOM</th>
+                    <th style={{ width: "15%" }}>Rate</th>
+                    <th style={{ width: "10%" }}>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {additionalExpenseItems.map((row) => (
+                    <tr key={row.id}>
+                      <td>{row.slNo}</td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.description}
+                          onChange={(e) =>
+                            updateAdditionalExpenseItem(
+                              row.id,
+                              "description",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.expenseType}
+                          onChange={(e) =>
+                            updateAdditionalExpenseItem(
+                              row.id,
+                              "expenseType",
+                              e.target.value
+                            )
+                          }
+                          style={{ backgroundColor: "#f5d982" }}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.unit}
+                          onChange={(e) =>
+                            updateAdditionalExpenseItem(
+                              row.id,
+                              "unit",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={row.uom}
+                          onChange={(e) =>
+                            updateAdditionalExpenseItem(
+                              row.id,
+                              "uom",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          value={row.rate}
+                          onChange={(e) =>
+                            updateAdditionalExpenseItem(
+                              row.id,
+                              "rate",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          value={row.amount}
+                          onChange={(e) =>
+                            updateAdditionalExpenseItem(
+                              row.id,
+                              "amount",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-2">
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={addAdditionalExpenseItem}
+              >
+                Add Row
+              </button>
+              {additionalExpenseItems.length > 1 && (
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm ms-2"
+                  onClick={() =>
+                    deleteAdditionalExpenseItem(
+                      additionalExpenseItems[additionalExpenseItems.length - 1]
+                        .id
+                    )
+                  }
+                >
+                  Delete Row
+                </button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setAdditionalExpenseDialogOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => setAdditionalExpenseDialogOpen(false)}
+          >
+            Save
+          </button>
+        </DialogActions>
+      </Dialog>
 
       <div className="companies-page">
         <div className="companies-header">
           <h2>Stock Item</h2>
-          <button onClick={openDialog} className="btn btn-primary new-btn">Add Stock Item</button>
+          <button onClick={openDialog} className="btn btn-primary new-btn">
+            Add Stock Item
+          </button>
         </div>
         <div className="pagination-container">
           <div className="entries-info">
@@ -467,8 +1229,8 @@ const StockItem = () => {
             <span>entries per page</span>
           </div>
           <div className="pagination-info">
-            Showing 1 to {filteredCompanies.length} of {filteredCompanies.length}{" "}
-            entries
+            Showing 1 to {filteredCompanies.length} of{" "}
+            {filteredCompanies.length} entries
             {filteredCompanies.length !== companiesData.length && (
               <span className="filtered-text">
                 {" "}

@@ -59,6 +59,8 @@ import Sales from "./pages/Sales/Sales";
 import Customer from "./pages/Sales/Customer";
 import Purchase from "./pages/Puchase/Purchase";
 import Vendor from "./pages/Puchase/Vendor";
+import WarehouseTransaction from "./pages/Warehouse Transaction/WarehouseTransaction";
+import GRN from "./pages/Warehouse Transaction/GRN";
 
 // Main layout component that includes Sidebar and Header
 const AppLayout = () => {
@@ -129,8 +131,10 @@ function App() {
           <Route path="/PurchaseEnquiry" element={<PurchaseEnquiry />} />
           <Route path="/Sales" element={<Sales />} />
           <Route path="/Customer" element={<Customer />} />
-          <Route path="/Purchase" element={<Purchase />} />
+          <Route path="/Purchase-Page" element={<Purchase />} />
           <Route path="/Vendor" element={<Vendor />} />
+          <Route path="/WarehouseTransaction" element={<WarehouseTransaction />} />
+          <Route path="/GRN-Page" element={<GRN />} />
 
           {/* Add other protected routes here */}
         </Route>

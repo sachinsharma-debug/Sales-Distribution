@@ -46,15 +46,15 @@ function Sidebar() {
   const isFaLedger = location.pathname.startsWith('/fa-ledger');
   const isSales = location.pathname.startsWith('/Sales');
   const isCustomer = location.pathname.startsWith('/Customer');
-  const isPurchase = location.pathname.startsWith('/Purchase');
+  const isPurchasePage = location.pathname.startsWith('/Purchase-Page');
   const isVendor = location.pathname.startsWith('/Vendor');
 
   // Tabs for normal pages
   const menuItems = [
     // { icon: '📊', label: 'Dashboard' },
-    { icon: '💳', label: 'Purchase', path: '/PurchaseEnquiry' },
+    { icon: '💳', label: 'Purchase Enquiry', path: '/PurchaseEnquiry' },
     { icon: '🧾', label: 'Reports' },
-    { icon: '📦', label: 'Inventory' },
+    { icon: '📦', label: 'Warehouse Transaction', path: '/WarehouseTransaction' },
     { icon: '🛒', label: 'Sales' },
     // { icon: '👥', label: 'Users' },
     { icon: '⚙️', label: 'Settings' },
@@ -71,7 +71,7 @@ function Sidebar() {
     { icon: '👥', label: 'HRMS' },
   ];
 
-  const displayMenu = isVendor || isPurchase || isCustomer || isSales || isFaLedger || isServiceType || isInsuranceType || isLocations || isCustodians || isDivision || isDepartment || isAssetCategory || isAssetGroup || isAssetClassification || isDepreciationMethod || isFinancialYear || isCourier || isTransporter || isSalesMan || isTermOfDelivery || isModeTerm || isCostCentre || isVoucherType || isGroup || isSettingsPage || isCompaniesPage || isBranchPage || isPlantPage || isStorePage || isAccountPage || isTaxationPage || isInventoryPage || isStockGroupPage || isStockCategoryPage || isUnitPage || isBrandPage || isItemMasterCondition || isStockItem || isFeatures || isStore || isRoles || isUsers ? settingsMenu : menuItems;
+  const displayMenu = isVendor || isPurchasePage || isCustomer || isSales || isFaLedger || isServiceType || isInsuranceType || isLocations || isCustodians || isDivision || isDepartment || isAssetCategory || isAssetGroup || isAssetClassification || isDepreciationMethod || isFinancialYear || isCourier || isTransporter || isSalesMan || isTermOfDelivery || isModeTerm || isCostCentre || isVoucherType || isGroup || isSettingsPage || isCompaniesPage || isBranchPage || isPlantPage || isStorePage || isAccountPage || isTaxationPage || isInventoryPage || isStockGroupPage || isStockCategoryPage || isUnitPage || isBrandPage || isItemMasterCondition || isStockItem || isFeatures || isStore || isRoles || isUsers ? settingsMenu : menuItems;
 
   return (
     <div className={`sidebar ${isSettingsPage ? 'settings-sidebar' : ''}`}>

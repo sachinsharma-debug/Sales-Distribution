@@ -61,6 +61,9 @@ import Purchase from "./pages/Puchase/Purchase";
 import Vendor from "./pages/Puchase/Vendor";
 import WarehouseTransaction from "./pages/Warehouse Transaction/WarehouseTransaction";
 import GRN from "./pages/Warehouse Transaction/GRN";
+import QualityControl from "./pages/Quality Control/QualityControl";
+import IndentManagement from "./pages/Indent/IndentManagement";
+import Indent from "./pages/Indent/Indent";
 
 // Main layout component that includes Sidebar and Header
 const AppLayout = () => {
@@ -135,6 +138,9 @@ function App() {
           <Route path="/Vendor" element={<Vendor />} />
           <Route path="/WarehouseTransaction" element={<WarehouseTransaction />} />
           <Route path="/GRN-Page" element={<GRN />} />
+          <Route path="/QualityControl" element={<QualityControl />} />
+          <Route path="/Indent-Management" element={<IndentManagement />} />
+          <Route path="/Indent-Page" element={<Indent />} />
 
           {/* Add other protected routes here */}
         </Route>

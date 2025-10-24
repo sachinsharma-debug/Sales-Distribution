@@ -32,7 +32,7 @@ const Header = () => {
       </div>
       <div>
         <strong>Date</strong>
-        <div>05 Sep 2025</div>
+        <div>22 OCT 2025</div>
       </div>
       <div className="right">
         <span>🔔</span>
@@ -50,27 +50,33 @@ const Header = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            JZ
+            D A
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
             <li>
-              <a class="dropdown-item" href="#" onClick={handleLogout}>
+              <button class="dropdown-item" onClick={handleLogout}>
                 Logout
-              </a>
+              </button>
             </li>
             <li>
-              <a class="dropdown-item" href="#">
+              <button
+                class="dropdown-item"
+                onClick={() => console.log("Action clicked")}
+              >
                 Another action
-              </a>
+              </button>
             </li>
             <li>
-              <a class="dropdown-item" href="#">
+              <button
+                class="dropdown-item"
+                onClick={() => console.log("Settings clicked")}
+              >
                 Something else here
-              </a>
+              </button>
             </li>
           </ul>
         </div>
-        <span>Jaydipsinh Zala</span>
+        <span>Demo Account</span>
       </div>
     </header>
   );

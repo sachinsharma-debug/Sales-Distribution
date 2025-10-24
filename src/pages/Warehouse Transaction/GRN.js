@@ -32,7 +32,10 @@ const GRN = () => {
 
     const [dialogOpen, setDialogOpen] = useState(false);
     const [secondDialogOpen, setSecondDialogOpen] = useState(false);
+    const [orderDetailsDialogOpen, setOrderDetailsDialogOpen] = useState(false);
+    const [itemAllocationDialogOpen, setItemAllocationDialogOpen] = useState(false);
     const [selectedName, setSelectedName] = useState("");
+    const [selectedItem, setSelectedItem] = useState("");
     const [SalesEnquiryData, setSalesEnquiryData] = useState([]);
 
     // Table data state
@@ -42,6 +45,23 @@ const GRN = () => {
             quantityActual: "50 PCS",
             approvedBilled: "50 PCS",
             reject: ""
+        }
+    ]);
+
+    // Item Allocation table data
+    const [itemAllocationData, setItemAllocationData] = useState([
+        {
+            trackingNo: "B1664",
+            orderNo: "Not Applicable",
+            godown: "RM Tech Store",
+            batchLotNo: "B1664750104202435",
+            quantityActual: "50 PCS",
+            quantityBilled: "50 PCS",
+            qcTest: "No",
+            qcNo: "No",
+            qcDate: "",
+            inspectionObservation: "",
+            insDate: ""
         }
     ]);
 
@@ -95,7 +115,10 @@ const GRN = () => {
     function closeDialog() {
         setDialogOpen(false);
         setSecondDialogOpen(false);
+        setOrderDetailsDialogOpen(false);
+        setItemAllocationDialogOpen(false);
         setSelectedName("");
+        setSelectedItem("");
     }
 
     function openSecondDialog() {
@@ -104,6 +127,24 @@ const GRN = () => {
 
     function closeSecondDialog() {
         setSecondDialogOpen(false);
+    }
+
+    function openOrderDetailsDialog() {
+        setOrderDetailsDialogOpen(true);
+    }
+
+    function closeOrderDetailsDialog() {
+        setOrderDetailsDialogOpen(false);
+    }
+
+    function openItemAllocationDialog(itemName) {
+        setSelectedItem(itemName);
+        setItemAllocationDialogOpen(true);
+    }
+
+    function closeItemAllocationDialog() {
+        setItemAllocationDialogOpen(false);
+        setSelectedItem("");
     }
 
     // Handle name selection
@@ -116,6 +157,20 @@ const GRN = () => {
         if (selectedValue) {
             openSecondDialog();
         }
+    };
+
+    // Handle item selection from dropdown
+    const handleItemSelect = (index, value) => {
+        if (value) {
+            openItemAllocationDialog(value);
+        }
+        
+        const updatedData = [...tableData];
+        updatedData[index] = {
+            ...updatedData[index],
+            nameOfItem: value
+        };
+        setTableData(updatedData);
     };
 
     // Dialog backdrop close handler
@@ -131,6 +186,18 @@ const GRN = () => {
         }
     };
 
+    const handleOrderDetailsBackdropClick = (e) => {
+        if (e.target === e.currentTarget) {
+            closeOrderDetailsDialog();
+        }
+    };
+
+    const handleItemAllocationBackdropClick = (e) => {
+        if (e.target === e.currentTarget) {
+            closeItemAllocationDialog();
+        }
+    };
+
     // Handle table data changes
     const handleTableDataChange = (index, field, value) => {
         const updatedData = [...tableData];
@@ -139,6 +206,16 @@ const GRN = () => {
             [field]: value
         };
         setTableData(updatedData);
+    };
+
+    // Handle item allocation data changes
+    const handleItemAllocationChange = (index, field, value) => {
+        const updatedData = [...itemAllocationData];
+        updatedData[index] = {
+            ...updatedData[index],
+            [field]: value
+        };
+        setItemAllocationData(updatedData);
     };
 
     // Add new row to table
@@ -154,6 +231,26 @@ const GRN = () => {
         ]);
     };
 
+    // Add new row to item allocation table
+    const addNewItemAllocationRow = () => {
+        setItemAllocationData([
+            ...itemAllocationData,
+            {
+                trackingNo: "",
+                orderNo: "",
+                godown: "",
+                batchLotNo: "",
+                quantityActual: "",
+                quantityBilled: "",
+                qcTest: "No",
+                qcNo: "No",
+                qcDate: "",
+                inspectionObservation: "",
+                insDate: ""
+            }
+        ]);
+    };
+
     // Remove row from table
     const removeRow = (index) => {
         if (tableData.length > 1) {
@@ -162,11 +259,21 @@ const GRN = () => {
         }
     };
 
+    // Remove row from item allocation table
+    const removeItemAllocationRow = (index) => {
+        const updatedData = itemAllocationData.filter((_, i) => i !== index);
+        setItemAllocationData(updatedData);
+    };
+
     // ESC key handler for dialogs
     useEffect(() => {
         const handleEscKey = (event) => {
             if (event.keyCode === 27) {
-                if (secondDialogOpen) {
+                if (itemAllocationDialogOpen) {
+                    closeItemAllocationDialog();
+                } else if (orderDetailsDialogOpen) {
+                    closeOrderDetailsDialog();
+                } else if (secondDialogOpen) {
                     closeSecondDialog();
                 } else if (dialogOpen) {
                     closeDialog();
@@ -178,7 +285,7 @@ const GRN = () => {
         return () => {
             document.removeEventListener('keydown', handleEscKey);
         };
-    }, [dialogOpen, secondDialogOpen]);
+    }, [dialogOpen, secondDialogOpen, orderDetailsDialogOpen, itemAllocationDialogOpen]);
 
     return (
         <>
@@ -254,21 +361,6 @@ const GRN = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="d-flex justify-content-end mt-3">
-                                <button
-                                    className="btn btn-secondary me-2"
-                                    onClick={closeDialog}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={addupdate}
-                                >
-                                    Save
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -305,13 +397,8 @@ const GRN = () => {
                             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
                         }}
                     >
-                        <div
-                            className="d-flex justify-content-between pb-3"
-                            style={{
-                                borderBottom: '1px solid #eee',
-                                marginBottom: '25px',
-                                alignItems: 'center'
-                            }}
+                        <div className="d-flex justify-content-between mb-2"
+
                         >
                             <div style={{
                                 fontSize: '20px'
@@ -331,25 +418,48 @@ const GRN = () => {
                                 ×
                             </button>
                         </div>
+                        <div className="d-flex justify-content-between company-form pb-3"
+                            style={{
+                                borderBottom: '1px solid #eee',
+                                marginBottom: '25px',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <div className=''>
+                                <div className='row'>
+                                    <div className='col-5 my-auto'>
+                                        <label className="form-label">GRN Service No.</label>
+                                    </div>
+                                    <div className='col-7'>
+                                        <input
+                                            type="text"
+                                            className="form-control form-control-sm"
+                                            style={{ border: '1px solid #ced4da' }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="">
+                                <div className="row">
+                                    <div className='col-5 my-auto'>
+                                        <label className="form-label">Date</label>
+                                    </div>
+                                    <div className='col-7'>
+                                        <input
+                                            type="date"
+                                            className="form-control form-control-sm"
+                                            style={{ border: '1px solid #ced4da' }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div className="dialog-body">
                             {/* Header Form Section */}
                             <div className="row mt-3 company-form" style={{ marginBottom: '10px', borderBottom: '1px solid #e9ecef', paddingBottom: '10px' }}>
-                                <div className='col-4 mb-3'>
-                                    <div className='row'>
-                                        <div className='col-5 my-auto'>
-                                            <label className="form-label">GRN Service No.</label>
-                                        </div>
-                                        <div className='col-7'>
-                                            <input
-                                                type="text"
-                                                className="form-control form-control-sm"
-                                                style={{ border: '1px solid #ced4da' }}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='col-4 mb-3'>
+
+                                <div className='col-3 mb-2'>
                                     <div className="row">
                                         <div className='col-5 my-auto'>
                                             <label className="form-label">Reference No</label>
@@ -363,7 +473,7 @@ const GRN = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className='col-4 mb-3'>
+                                <div className='col-3 mb-2'>
                                     <div className="row">
                                         <div className='col-5 my-auto'>
                                             <label className="form-label">Date</label>
@@ -377,7 +487,9 @@ const GRN = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className='col-4 mb-3'>
+                                <div className='col-3 mb-2'></div>
+                                <div className='col-3 mb-2'></div>
+                                <div className='col-3 mb-2'>
                                     <div className="row">
                                         <div className='col-5 my-auto'>
                                             <label className="form-label">Party A/c Name</label>
@@ -395,7 +507,17 @@ const GRN = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className='col-4 mb-3'>
+                                <div className='col-3 mb-2'>
+                                    <button
+                                        className="btn btn-primary me-2"
+                                        onClick={openOrderDetailsDialog}
+                                    >
+                                        Order Details
+                                    </button>
+                                </div>
+                                <div className='col-3 mb-2'></div>
+                                <div className='col-3 mb-2'></div>
+                                <div className='col-3 mb-2'>
                                     <div className="row">
                                         <div className='col-5 my-auto'>
                                             <label className="form-label">Purchase Ledger</label>
@@ -446,11 +568,11 @@ const GRN = () => {
                                                         Quantity
                                                         <div>
                                                             <tr style={{ backgroundColor: '#e3f2fd', textAlign: 'center', width: '100%' }}>
-                                                                <th className="bg-light" style={{ border: '1px solid #dee2e6', padding: '0px 12px', fontWeight: '600', width: '24%', textAlign: 'center' }}>
+                                                                <th className="bg-light" style={{ border: '1px solid #dee2e6', padding: '0px 12px', fontWeight: '600', width: '12%', textAlign: 'center' }}>
                                                                     Actual
                                                                 </th>
-                                                                <th className="bg-light" style={{ border: '1px solid #dee2e6', padding: '0px 12px', fontWeight: '600', width: '24%', textAlign: 'center' }}>
-                                                                    Approved Billed
+                                                                <th className="bg-light" style={{ border: '1px solid #dee2e6', padding: '0px 12px', fontWeight: '600', width: '12%', textAlign: 'center' }}>
+                                                                    Billed
                                                                 </th>
                                                             </tr>
                                                         </div>
@@ -484,17 +606,19 @@ const GRN = () => {
                                                             border: '1px solid #dee2e6',
                                                             padding: '12px'
                                                         }}>
-                                                            <input
-                                                                type="text"
-                                                                className="form-control form-control-sm"
+                                                            <select
+                                                                className="form-control form-control-sm name-of-item"
+                                                                style={{ border: '1px solid #ced4da' }}
                                                                 value={row.nameOfItem}
-                                                                onChange={(e) => handleTableDataChange(index, 'nameOfItem', e.target.value)}
-                                                                placeholder="Enter item name"
-                                                                style={{
-                                                                    border: '1px solid #ced4da',
-                                                                    textAlign: 'center'
-                                                                }}
-                                                            />
+                                                                onChange={(e) => handleItemSelect(index, e.target.value)}
+                                                            >
+                                                                <option value="">Select Item</option>
+                                                                <option value="SMA Wire 150mm">SMA Wire 150mm</option>
+                                                                <option value="Copper Wire 200mm">Copper Wire 200mm</option>
+                                                                <option value="Fiber Optic Cable">Fiber Optic Cable</option>
+                                                                <option value="Network Switch">Network Switch</option>
+                                                                <option value="Router Device">Router Device</option>
+                                                            </select>
                                                         </td>
                                                         <td style={{
                                                             border: '1px solid #dee2e6',
@@ -558,7 +682,7 @@ const GRN = () => {
                                                             </Button>
                                                             <Button
                                                                 variant="primary"
-                                                                    size="sm"
+                                                                size="sm"
                                                                 onClick={addNewRow}
                                                             >
                                                                 <i className="fas fa-plus"></i>
@@ -578,7 +702,6 @@ const GRN = () => {
                                     className="btn btn-outline-secondary"
                                     onClick={closeSecondDialog}
                                     style={{
-                                        // borderRadius: '25px',
                                         padding: '8px 25px',
                                         fontWeight: '600'
                                     }}
@@ -590,7 +713,6 @@ const GRN = () => {
                                         className="btn btn-outline-secondary me-3"
                                         onClick={closeDialog}
                                         style={{
-                                            // borderRadius: '25px',
                                             padding: '8px 25px',
                                             fontWeight: '600'
                                         }}
@@ -601,7 +723,6 @@ const GRN = () => {
                                         className="btn btn-primary"
                                         onClick={addupdate}
                                         style={{
-                                            // borderRadius: '25px',
                                             padding: '8px 30px',
                                             fontWeight: '600',
                                             background: '#007bff',
@@ -611,6 +732,763 @@ const GRN = () => {
                                         Save GRN
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Order Details Dialog */}
+            {orderDetailsDialogOpen && (
+                <div
+                    className="dialog-backdrop"
+                    onClick={handleOrderDetailsBackdropClick}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1002,
+                    }}
+                >
+                    <div
+                        className="dialog-content"
+                        style={{
+                            background: 'white',
+                            borderRadius: '8px',
+                            padding: '20px',
+                            minWidth: '800px',
+                            maxWidth: '80vw',
+                            maxHeight: '80vh',
+                            overflow: 'auto',
+                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+                        }}
+                    >
+                        <div className="d-flex justify-content-between mb-3"
+                            style={{ borderBottom: '1px solid #eee', paddingBottom: '15px' }}
+                        >
+                            <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                                Order Details
+                            </div>
+                            <button
+                                onClick={closeOrderDetailsDialog}
+                                style={{
+                                    border: 'none',
+                                    background: 'none',
+                                    fontSize: '18px',
+                                    cursor: 'pointer',
+                                    color: '#6c757d',
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div className="dialog-body">
+
+                            <div className="row pb-3" style={{ borderBottom: '1px solid #ccc' }}>
+                                <div className='col-5 mb-2'>
+                                    <div className="row">
+                                        <div className='col-4 my-auto'>
+                                            <label className="form-label my-auto">Order No :</label>
+                                        </div>
+                                        <div className='col-7'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Select Order</option>
+                                                <option>Not Applicable</option>
+                                                <option>Order 2</option>
+                                                <option>Order 3</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-6 offset-1">
+                                    <div className="row">
+                                        <div className='col-6 my-auto offset-1'>
+                                            <label className="form-label">Mode/Terms Of Payment</label>
+                                        </div>
+                                        <div className='col-5'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+
+                                        <div className='col-6 mt-2 offset-1'>
+                                            <label className="form-label my-auto">Other References</label>
+                                        </div>
+                                        <div className='col-5 mt-2'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+
+                                        <div className='col-6 mt-2 offset-1'>
+                                            <label className="form-label my-auto">Term Of Delivery</label>
+                                        </div>
+                                        <div className='col-5 mt-2'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row">
+                                <div className="col-12 py-3">
+                                    <div className="text-center" style={{ fontWeight: 600 }}>Receipt Details</div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="row">
+                                        <div className='col-3 my-auto'>
+                                            <label className="form-label">Dispatch Mode</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="row mt-2">
+                                        <div className='col-3 my-auto'>
+                                            <label className="form-label">Transporter Name</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row mt-2">
+                                        <div className='col-3 my-auto'>
+                                            <label className="form-label">Designation</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row mt-2">
+                                        <div className='col-3 my-auto'>
+                                            <label className="form-label">Lr No.</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row mt-2">
+                                        <div className='col-3 my-auto'>
+                                            <label className="form-label">Lr Dt.</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row mt-2">
+                                        <div className='col-3 my-auto'>
+                                            <label className="form-label">Carrer Name/Agent</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row mt-2">
+                                        <div className='col-3 my-auto'>
+                                            <label className="form-label">Bill Of Landing/LR-RR No.</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+
+                                        <div className='col-2 my-auto offset-1'>
+                                            <label className="form-label">Date</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="date"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row mt-2">
+                                        <div className='col-3 my-auto'>
+                                            <label className="form-label">Motor Vehicle No.</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row mt-2">
+                                        <div className='col-3 my-auto'>
+                                            <label className="form-label">POD No.</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+
+                                        <div className='col-2 my-auto offset-1'>
+                                            <label className="form-label">POD Dt.</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row mt-2">
+                                        <div className='col-3 my-auto'>
+                                            <label className="form-label my-auto">Inward Info</label>
+                                        </div>
+                                        <div className='col-3'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>No</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            {/* Footer Buttons */}
+                            <div className="d-flex justify-content-end mt-4 pt-3" style={{ borderTop: '1px solid #e9ecef' }}>
+                                <button
+                                    className="btn btn-outline-secondary me-3"
+                                    onClick={closeOrderDetailsDialog}
+                                    style={{
+                                        padding: '6px 20px',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    Close
+                                </button>
+                                <button
+                                    className="btn btn-primary"
+                                    style={{
+                                        padding: '6px 25px',
+                                        fontWeight: '600',
+                                        background: '#007bff',
+                                        border: 'none'
+                                    }}
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Item Allocation Dialog - Exact match to image */}
+            {itemAllocationDialogOpen && (
+                <div
+                    className="dialog-backdrop"
+                    onClick={handleItemAllocationBackdropClick}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1003,
+                    }}
+                >
+                    <div
+                        className="dialog-content"
+                        style={{
+                            background: 'white',
+                            borderRadius: '8px',
+                            padding: '25px',
+                            minWidth: '1200px',
+                            maxWidth: '95vw',
+                            maxHeight: '90vh',
+                            overflow: 'auto',
+                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+                        }}
+                    >
+                        <div className="d-flex justify-content-between mb-3"
+                            style={{ borderBottom: '1px solid #eee', paddingBottom: '15px' }}
+                        >
+                            <div style={{ fontSize: '20px', fontWeight: 'bold' }}>
+                                Item Allocations for : <strong>{selectedItem}</strong>
+                            </div>
+                            <button
+                                onClick={closeItemAllocationDialog}
+                                style={{
+                                    border: 'none',
+                                    background: 'none',
+                                    fontSize: '18px',
+                                    cursor: 'pointer',
+                                    color: '#6c757d',
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div className="dialog-body">
+                            {/* Item Allocation Table */}
+                            <div className="table-responsive">
+                                <table className="table table-bordered" style={{ 
+                                    fontSize: '14px',
+                                    border: '2px solid #dee2e6'
+                                }}>
+                                    <thead>
+                                        <tr style={{ 
+                                            backgroundColor: '#007bff', 
+                                            color: 'white',
+                                            border: '2px solid #dee2e6'
+                                        }}>
+                                            <th style={{ 
+                                                padding: '12px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6',
+                                                width: '12%'
+                                            }}>Godown</th>
+                                            <th style={{ 
+                                                padding: '12px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6',
+                                                width: '15%'
+                                            }}>Batch/Lot No.</th>
+                                            <th colSpan="2" style={{ 
+                                                padding: '12px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6',
+                                                width: '16%'
+                                            }}>Quantity</th>
+                                            <th style={{ 
+                                                padding: '12px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6',
+                                                width: '8%'
+                                            }}>QC Test</th>
+                                            <th style={{ 
+                                                padding: '12px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6',
+                                                width: '8%'
+                                            }}>QC No</th>
+                                            <th style={{ 
+                                                padding: '12px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6',
+                                                width: '10%'
+                                            }}>QC Date</th>
+                                            <th style={{ 
+                                                padding: '12px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6',
+                                                width: '15%'
+                                            }}>Inspection Observation</th>
+                                            <th style={{ 
+                                                padding: '12px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6',
+                                                width: '10%'
+                                            }}>Ins Date</th>
+                                            <th style={{ 
+                                                padding: '12px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6',
+                                                width: '8%'
+                                            }}>Action</th>
+                                        </tr>
+                                        <tr style={{ 
+                                            backgroundColor: '#e3f2fd',
+                                            border: '2px solid #dee2e6'
+                                        }}>
+                                            <th style={{ border: '1px solid #dee2e6' }}></th>
+                                            <th style={{ border: '1px solid #dee2e6' }}></th>
+                                            <th style={{ 
+                                                padding: '8px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6'
+                                            }}>Actual</th>
+                                            <th style={{ 
+                                                padding: '8px', 
+                                                textAlign: 'center', 
+                                                fontWeight: '600',
+                                                border: '1px solid #dee2e6'
+                                            }}>Billed</th>
+                                            <th style={{ border: '1px solid #dee2e6' }}></th>
+                                            <th style={{ border: '1px solid #dee2e6' }}></th>
+                                            <th style={{ border: '1px solid #dee2e6' }}></th>
+                                            <th style={{ border: '1px solid #dee2e6' }}></th>
+                                            <th style={{ border: '1px solid #dee2e6' }}></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {itemAllocationData.map((row, index) => (
+                                            <React.Fragment key={index}>
+                                                {/* Tracking and Order Info Row */}
+                                                <tr style={{ 
+                                                    backgroundColor: '#f8f9fa',
+                                                    border: '2px solid #dee2e6'
+                                                }}>
+                                                    <td colSpan="9" style={{ 
+                                                        padding: '8px 12px',
+                                                        border: '1px solid #dee2e6',
+                                                        fontSize: '13px'
+                                                    }}>
+                                                        <div className="row align-items-center">
+                                                            <div className="col-md-3">
+                                                                <span style={{ 
+                                                                    fontStyle: 'italic',
+                                                                    fontWeight: '500',
+                                                                    color: '#495057'
+                                                                }}>
+                                                                    Tracking No. : 
+                                                                </span>
+                                                                <select
+                                                                    className="form-control form-control-sm d-inline-block py-1 px-2"
+                                                                    value={row.trackingNo}
+                                                                    onChange={(e) => handleItemAllocationChange(index, 'trackingNo', e.target.value)}
+                                                                    style={{
+                                                                        width: 'auto',
+                                                                        display: 'inline-block',
+                                                                        marginLeft: '8px'
+                                                                    }}
+                                                                >
+                                                                    <option value="">Select Tracking No.</option>
+                                                                    <option value="B1664">B1664</option>
+                                                                    <option value="B1665">B1665</option>
+                                                                    <option value="B1666">B1666</option>
+                                                                </select>
+                                                            </div>
+                                                            <div className="col-md-3">
+                                                                <span style={{ 
+                                                                    fontStyle: 'italic',
+                                                                    fontWeight: '500',
+                                                                    color: '#495057'
+                                                                }}>
+                                                                    Order No. : 
+                                                                </span>
+                                                                <select
+                                                                    className="form-control form-control-sm d-inline-block py-1 px-2"
+                                                                    value={row.orderNo}
+                                                                    onChange={(e) => handleItemAllocationChange(index, 'orderNo', e.target.value)}
+                                                                    style={{
+                                                                        width: 'auto',
+                                                                        display: 'inline-block',
+                                                                        marginLeft: '8px'
+                                                                    }}
+                                                                >
+                                                                    <option value="">Select Order</option>
+                                                                    <option value="Not Applicable">Not Applicable</option>
+                                                                    <option value="ORD001">ORD001</option>
+                                                                    <option value="ORD002">ORD002</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {/* Data Row */}
+                                                <tr style={{ 
+                                                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#f8f9fa',
+                                                    border: '2px solid #dee2e6'
+                                                }}>
+                                                    <td style={{ 
+                                                        padding: '10px',
+                                                        border: '1px solid #dee2e6',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm"
+                                                            value={row.godown}
+                                                            onChange={(e) => handleItemAllocationChange(index, 'godown', e.target.value)}
+                                                            style={{ 
+                                                                border: '1px solid #ced4da', 
+                                                                textAlign: 'center',
+                                                                fontSize: '13px',
+                                                                padding: '4px 8px'
+                                                            }}
+                                                        />
+                                                    </td>
+                                                    <td style={{ 
+                                                        padding: '10px',
+                                                        border: '1px solid #dee2e6',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm"
+                                                            value={row.batchLotNo}
+                                                            onChange={(e) => handleItemAllocationChange(index, 'batchLotNo', e.target.value)}
+                                                            style={{ 
+                                                                border: '1px solid #ced4da', 
+                                                                textAlign: 'center',
+                                                                fontSize: '13px',
+                                                                padding: '4px 8px'
+                                                            }}
+                                                        />
+                                                    </td>
+                                                    <td style={{ 
+                                                        padding: '10px',
+                                                        border: '1px solid #dee2e6',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm"
+                                                            value={row.quantityActual}
+                                                            onChange={(e) => handleItemAllocationChange(index, 'quantityActual', e.target.value)}
+                                                            style={{ 
+                                                                border: '1px solid #ced4da', 
+                                                                textAlign: 'center',
+                                                                fontSize: '13px',
+                                                                padding: '4px 8px'
+                                                            }}
+                                                        />
+                                                    </td>
+                                                    <td style={{ 
+                                                        padding: '10px',
+                                                        border: '1px solid #dee2e6',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm"
+                                                            value={row.quantityBilled}
+                                                            onChange={(e) => handleItemAllocationChange(index, 'quantityBilled', e.target.value)}
+                                                            style={{ 
+                                                                border: '1px solid #ced4da', 
+                                                                textAlign: 'center',
+                                                                fontSize: '13px',
+                                                                padding: '4px 8px'
+                                                            }}
+                                                        />
+                                                    </td>
+                                                    <td style={{ 
+                                                        padding: '10px',
+                                                        border: '1px solid #dee2e6',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <select
+                                                            className="form-control form-control-sm"
+                                                            value={row.qcTest}
+                                                            onChange={(e) => handleItemAllocationChange(index, 'qcTest', e.target.value)}
+                                                            style={{ 
+                                                                border: '1px solid #ced4da', 
+                                                                textAlign: 'center',
+                                                                fontSize: '13px',
+                                                                padding: '4px 8px'
+                                                            }}
+                                                        >
+                                                            <option value="No">No</option>
+                                                            <option value="Yes">Yes</option>
+                                                        </select>
+                                                    </td>
+                                                    <td style={{ 
+                                                        padding: '10px',
+                                                        border: '1px solid #dee2e6',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <select
+                                                            className="form-control form-control-sm"
+                                                            value={row.qcNo}
+                                                            onChange={(e) => handleItemAllocationChange(index, 'qcNo', e.target.value)}
+                                                            style={{ 
+                                                                border: '1px solid #ced4da', 
+                                                                textAlign: 'center',
+                                                                fontSize: '13px',
+                                                                padding: '4px 8px'
+                                                            }}
+                                                        >
+                                                            <option value="No">No</option>
+                                                            <option value="Yes">Yes</option>
+                                                        </select>
+                                                    </td>
+                                                    <td style={{ 
+                                                        padding: '10px',
+                                                        border: '1px solid #dee2e6',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <input
+                                                            type="date"
+                                                            className="form-control form-control-sm"
+                                                            value={row.qcDate}
+                                                            onChange={(e) => handleItemAllocationChange(index, 'qcDate', e.target.value)}
+                                                            style={{ 
+                                                                border: '1px solid #ced4da', 
+                                                                textAlign: 'center',
+                                                                fontSize: '13px',
+                                                                padding: '4px 8px'
+                                                            }}
+                                                        />
+                                                    </td>
+                                                    <td style={{ 
+                                                        padding: '10px',
+                                                        border: '1px solid #dee2e6',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm"
+                                                            value={row.inspectionObservation}
+                                                            onChange={(e) => handleItemAllocationChange(index, 'inspectionObservation', e.target.value)}
+                                                            style={{ 
+                                                                border: '1px solid #ced4da', 
+                                                                textAlign: 'center',
+                                                                fontSize: '13px',
+                                                                padding: '4px 8px'
+                                                            }}
+                                                        />
+                                                    </td>
+                                                    <td style={{ 
+                                                        padding: '10px',
+                                                        border: '1px solid #dee2e6',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <input
+                                                            type="date"
+                                                            className="form-control form-control-sm"
+                                                            value={row.insDate}
+                                                            onChange={(e) => handleItemAllocationChange(index, 'insDate', e.target.value)}
+                                                            style={{ 
+                                                                border: '1px solid #ced4da', 
+                                                                textAlign: 'center',
+                                                                fontSize: '13px',
+                                                                padding: '4px 8px'
+                                                            }}
+                                                        />
+                                                    </td>
+                                                    <td style={{ 
+                                                        padding: '10px',
+                                                        border: '1px solid #dee2e6'}}>
+                                                            <div className="d-flex gap-2">
+                                                                    <Button
+                                                                        variant="outline-danger"
+                                                                        size="sm"
+                                                                        onClick={() => removeItemAllocationRow(index)}
+                                                                        disabled={itemAllocationData.length === 1}
+                                                                        style={{
+                                                                            padding: '4px 8px',
+                                                                            fontSize: '12px'
+                                                                        }}
+                                                                    >
+                                                                        <i className="fas fa-trash"></i>
+                                                                    </Button>
+                                                                    {index === itemAllocationData.length - 1 && (
+                                                                        <Button
+                                                                            variant="primary"
+                                                                            size="sm"
+                                                                            onClick={addNewItemAllocationRow}
+                                                                            style={{
+                                                                                padding: '4px 8px',
+                                                                                fontSize: '12px'
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-plus"></i>
+                                                                        </Button>
+                                                                    )}
+                                                                </div>
+                                                        </td>
+                                                </tr>
+                                            </React.Fragment>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                            {/* Footer Buttons */}
+                            <div className="d-flex justify-content-end mt-4 pt-3" style={{ borderTop: '1px solid #e9ecef' }}>
+                                <button
+                                    className="btn btn-outline-secondary me-3"
+                                    onClick={closeItemAllocationDialog}
+                                    style={{
+                                        padding: '8px 24px',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    Close
+                                </button>
+                                <button
+                                    className="btn btn-primary"
+                                    style={{
+                                        padding: '8px 24px',
+                                        fontWeight: '600',
+                                        background: '#007bff',
+                                        border: 'none'
+                                    }}
+                                >
+                                    Save Allocations
+                                </button>
                             </div>
                         </div>
                     </div>

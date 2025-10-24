@@ -55,7 +55,9 @@ function Sidebar() {
     { icon: '💳', label: 'Purchase Enquiry', path: '/PurchaseEnquiry' },
     { icon: '🧾', label: 'Reports' },
     { icon: '📦', label: 'Warehouse Transaction', path: '/WarehouseTransaction' },
-    { icon: '🛒', label: 'Sales' },
+    { icon: "🔍", label: "Quality Control", path: "/QualityControl" },
+    { icon: '🛒', label: 'Indent', path: '/Indent-Management' },
+    // { icon: '🛒', label: 'Sales' },
     // { icon: '👥', label: 'Users' },
     { icon: '⚙️', label: 'Settings' },
   ];

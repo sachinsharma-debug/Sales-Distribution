@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import '../Settings/Settings.css';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import "../Settings/Settings.css";
 
 export default function Inventory() {
   const [showModal1, setShowModal1] = useState(false); // Stock Parameter modal
@@ -25,15 +25,29 @@ export default function Inventory() {
             <div className="simple-org-container">
               <div className="org-header">Inventory List</div>
               <div className="org-list">
-                <div className="org-tab" onClick={openModal1} style={{ cursor: 'pointer' }}>
+                <div
+                  className="org-tab"
+                  onClick={openModal1}
+                  style={{ cursor: "pointer" }}
+                >
                   Stock Parameter
                 </div>
 
-                <Link to="/unit"><div className="org-tab">Unit</div></Link>
-                <Link to="/stockgroup"><div className="org-tab">Stock Group</div></Link>
-                <Link to="/stockcategory"><div className="org-tab">Stock Category</div></Link>
-                <Link to="/stockitem"><div className="org-tab">Stock Item</div></Link>
-                <Link to="/brand"><div className="org-tab">Brand</div></Link>
+                <Link to="/unit">
+                  <div className="org-tab">Unit</div>
+                </Link>
+                <Link to="/brand">
+                  <div className="org-tab">Brand</div>
+                </Link>
+                <Link to="/stockgroup">
+                  <div className="org-tab">Stock Group</div>
+                </Link>
+                <Link to="/stockcategory">
+                  <div className="org-tab">Stock Category</div>
+                </Link>
+                <Link to="/stockitem">
+                  <div className="org-tab">Stock Item</div>
+                </Link>
               </div>
             </div>
           </div>
@@ -43,10 +57,12 @@ export default function Inventory() {
       {/* First Modal - Stock Parameter */}
       {showModal1 && (
         <div className="modal-overlay">
-          <div className='modal-box' style={{ width: '400px' }}>
-            <div className='modal-header'>
+          <div className="modal-box" style={{ width: "400px" }}>
+            <div className="modal-header">
               <h5>Stock Parameter</h5>
-              <button className="close-button text-end" onClick={closeModal1}>&times;</button>
+              <button className="close-button text-end" onClick={closeModal1}>
+                &times;
+              </button>
             </div>
             <div className="modal-body mt-0">
               <table className="table">
@@ -57,7 +73,13 @@ export default function Inventory() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr onClick={() => { openModal2(); closeModal1(); }} style={{ cursor: 'pointer' }}>
+                  <tr
+                    onClick={() => {
+                      openModal2();
+                      closeModal1();
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
                     <th scope="row">1</th>
                     <td>Mark</td>
                   </tr>
@@ -79,13 +101,15 @@ export default function Inventory() {
       {/* Second Modal - Details */}
       {showModal2 && (
         <div className="modal-overlay">
-          <div className='modal-box p-3' style={{ width: '1000px' }}>
+          <div className="modal-box p-3" style={{ width: "1000px" }}>
             <div className="modal-header">
-              <h5 className='my-auto'>1</h5>
-              <button className="close-button" onClick={closeModal2}>&times;</button>
+              <h5 className="my-auto">1</h5>
+              <button className="close-button" onClick={closeModal2}>
+                &times;
+              </button>
             </div>
 
-            <div className='text-end'>
+            <div className="text-end">
               <button className="btn btn-primary" onClick={openModal3}>
                 Create
               </button>
@@ -94,11 +118,21 @@ export default function Inventory() {
             <table className="table mt-2">
               <thead>
                 <tr>
-                  <th style={{ backgroundColor: '#4a6db5', color: '#ffffff' }}>Sl No.</th>
-                  <th style={{ backgroundColor: '#4a6db5', color: '#ffffff' }}>Master ID</th>
-                  <th style={{ backgroundColor: '#4a6db5', color: '#ffffff' }}>Mailing Name</th>
-                  <th style={{ backgroundColor: '#4a6db5', color: '#ffffff' }}>Name</th>
-                  <th style={{ backgroundColor: '#4a6db5', color: '#ffffff' }}>Abbreviation</th>
+                  <th style={{ backgroundColor: "#4a6db5", color: "#ffffff" }}>
+                    Sl No.
+                  </th>
+                  <th style={{ backgroundColor: "#4a6db5", color: "#ffffff" }}>
+                    Master ID
+                  </th>
+                  <th style={{ backgroundColor: "#4a6db5", color: "#ffffff" }}>
+                    Mailing Name
+                  </th>
+                  <th style={{ backgroundColor: "#4a6db5", color: "#ffffff" }}>
+                    Name
+                  </th>
+                  <th style={{ backgroundColor: "#4a6db5", color: "#ffffff" }}>
+                    Abbreviation
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -132,28 +166,37 @@ export default function Inventory() {
       {/* Third Modal - Create */}
       {showModal3 && (
         <div className="modal-overlay">
-          <div className="modal-box p-4" style={{ width: '500px' }}>
+          <div className="modal-box p-4" style={{ width: "500px" }}>
             <div className="modal-header mb-3">
               <h5 className="my-auto">Create Stock Parameter</h5>
-              <button className="close-button" onClick={closeModal3}>&times;</button>
+              <button className="close-button" onClick={closeModal3}>
+                &times;
+              </button>
             </div>
 
             <div className="modal-body">
-              
               <div className="mb-3 row">
-                <div className='col-4 my-auto'>
-                  <label className='mb-1'>Mailing Name</label>
+                <div className="col-4 my-auto">
+                  <label className="mb-1">Mailing Name</label>
                 </div>
-                <div className='col-8'>
-                  <input type="text" className="form-control" placeholder="Enter Mailing Name" />
+                <div className="col-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter Mailing Name"
+                  />
                 </div>
               </div>
-              <div className='row'>
-                <div className='col-4 my-auto'>
-                  <label className='mb-1'>Abbreviation</label>
+              <div className="row">
+                <div className="col-4 my-auto">
+                  <label className="mb-1">Abbreviation</label>
                 </div>
-                <div className='col-8'>
-                  <input type="text" className="form-control" placeholder="Enter Mailing Name" />
+                <div className="col-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter Mailing Name"
+                  />
                 </div>
               </div>
               <div className="text-end mt-3">

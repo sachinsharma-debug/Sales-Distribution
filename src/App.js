@@ -64,6 +64,24 @@ import GRN from "./pages/Warehouse Transaction/GRN";
 import QualityControl from "./pages/Quality Control/QualityControl";
 import IndentManagement from "./pages/Indent/IndentManagement";
 import Indent from "./pages/Indent/Indent";
+import IndentVoucherRegister from "./pages/Indent/IndentVoucherRegister";
+import IndentVoucherPending from "./pages/Indent/IndentVoucherPending";
+import IndentClosed from "./pages/Indent/IndentClosed";
+import IndentPreClosed from "./pages/Indent/IndentPreClosed";
+import PurchaseManagement from "./pages/Purchase Management/PurchaseManagement";
+import PoCapital from "./pages/Purchase Management/PoCapital";
+
+import RMInwardInspection from "./pages/Quality Control/RMInwardInspection";
+import RMSampleInspection from "./pages/Quality Control/RMSampleInspection";
+import FGInwardInspection from "./pages/Quality Control/FGInwardInspection";
+import TestReport from "./pages/Quality Control/TestReport";
+import OCAnalysis from "./pages/Quality Control/OCAnalysis";
+import IncomingRMInspectionRegister from "./pages/Quality Control/IncomingRMInspectionRegister";
+import RejectionGraph from "./pages/Quality Control/RejectionGraph";
+import TestReportRegister from "./pages/Quality Control/TestReportRegister";
+import UpdateItem from "./pages/Quality Control/UpdateItem";
+import UpdateMultiItem from "./pages/Quality Control/UpdateMultiItem";
+
 
 // Main layout component that includes Sidebar and Header
 const AppLayout = () => {
@@ -141,6 +159,28 @@ function App() {
           <Route path="/QualityControl" element={<QualityControl />} />
           <Route path="/Indent-Management" element={<IndentManagement />} />
           <Route path="/Indent-Page" element={<Indent />} />
+          <Route path="/Indent-Voucher-Register" element={<IndentVoucherRegister />} />
+          <Route path="/Indent-Voucher-Pending" element={<IndentVoucherPending />} />
+          <Route path="/Indent-Closed" element={<IndentClosed />} />
+          <Route path="/Indent-Pre-Closed" element={<IndentPreClosed />} />
+          <Route path="/PurchaseManagement" element={<PurchaseManagement />} />
+          <Route path="/PoCapital" element={<PoCapital />} />
+          <Route path="/rminward-inspection" element={<RMInwardInspection />} />
+          <Route path="/rmsample-inspection" element={<RMSampleInspection />} />
+          <Route path="/fginward-inspection" element={<FGInwardInspection />} />
+          <Route path="/test-report" element={<TestReport />} />
+          <Route path="/oc-analysis" element={<OCAnalysis />} />
+          <Route
+            path="/incoming-rm-inspection-register"
+            element={<IncomingRMInspectionRegister />}
+          />
+          <Route path="/rejection-graph" element={<RejectionGraph />} />
+          <Route
+            path="/test-report-register"
+            element={<TestReportRegister />}
+          />
+          <Route path="/update-item" element={<UpdateItem />} />
+          <Route path="/update-multi-item" element={<UpdateMultiItem />} />
 
           {/* Add other protected routes here */}
         </Route>

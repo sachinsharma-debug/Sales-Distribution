@@ -52,7 +52,7 @@ function Sidebar() {
   // Tabs for normal pages
   const menuItems = [
     // { icon: '📊', label: 'Dashboard' },
-    { icon: '💳', label: 'Purchase Enquiry', path: '/PurchaseEnquiry' },
+    { icon: '💳', label: 'Purchase Management', path: '/PurchaseManagement' },
     { icon: '🧾', label: 'Reports' },
     { icon: '📦', label: 'Warehouse Transaction', path: '/WarehouseTransaction' },
     { icon: "🔍", label: "Quality Control", path: "/QualityControl" },

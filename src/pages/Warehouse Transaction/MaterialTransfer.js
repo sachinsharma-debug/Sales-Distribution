@@ -3,7 +3,7 @@ import "../Settings/Branches.css";
 import { BASE_URL } from "../../api/common";
 import { Button } from "react-bootstrap";
 
-export default function PoCapital() {
+export default function MaterialTransfer() {
 
     const [searchFilters, setSearchFilters] = useState({
         name: "",
@@ -293,7 +293,7 @@ export default function PoCapital() {
                     closeOrderDetailsDialog();
                 } else if (partyDetailsDialogOpen) {
                     closePartyDetailsDialog();
-                 } else if (secondDialogOpen) {
+                } else if (secondDialogOpen) {
                     closeSecondDialog();
                 } else if (dialogOpen) {
                     closeDialog();
@@ -425,7 +425,7 @@ export default function PoCapital() {
                                 <div className="col-12">
                                     <div className="row">
                                         <div className='col-3 my-auto'>
-                                            <label className="form-label">Dispatch Mode</label>
+                                            <label className="form-label">Dispatch DOC No</label>
                                         </div>
                                         <div className='col-3'>
                                             <input
@@ -437,7 +437,7 @@ export default function PoCapital() {
                                     </div>
                                     <div className="row mt-2">
                                         <div className='col-3 my-auto'>
-                                            <label className="form-label">Transporter Name</label>
+                                            <label className="form-label">Dispatched Through</label>
                                         </div>
                                         <div className='col-3'>
                                             <input
@@ -461,32 +461,7 @@ export default function PoCapital() {
                                         </div>
                                     </div>
 
-                                    <div className="row mt-2">
-                                        <div className='col-3 my-auto'>
-                                            <label className="form-label">Lr No.</label>
-                                        </div>
-                                        <div className='col-3'>
-                                            <input
-                                                type="text"
-                                                className="form-control form-control-sm py-1 px-2"
-                                                style={{ border: '1px solid #ced4da' }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="row mt-2">
-                                        <div className='col-3 my-auto'>
-                                            <label className="form-label">Lr Dt.</label>
-                                        </div>
-                                        <div className='col-3'>
-                                            <input
-                                                type="text"
-                                                className="form-control form-control-sm py-1 px-2"
-                                                style={{ border: '1px solid #ced4da' }}
-                                            />
-                                        </div>
-                                    </div>
-
+                                    
                                     <div className="row mt-2">
                                         <div className='col-3 my-auto'>
                                             <label className="form-label">Carrer Name/Agent</label>
@@ -537,42 +512,18 @@ export default function PoCapital() {
                                         </div>
                                     </div>
 
-                                    <div className="row mt-2">
-                                        <div className='col-3 my-auto'>
-                                            <label className="form-label">POD No.</label>
-                                        </div>
-                                        <div className='col-3'>
-                                            <input
-                                                type="text"
-                                                className="form-control form-control-sm py-1 px-2"
-                                                style={{ border: '1px solid #ced4da' }}
-                                            />
-                                        </div>
-
-                                        <div className='col-2 my-auto offset-1'>
-                                            <label className="form-label">POD Dt.</label>
-                                        </div>
-                                        <div className='col-3'>
-                                            <input
-                                                type="text"
-                                                className="form-control form-control-sm py-1 px-2"
-                                                style={{ border: '1px solid #ced4da' }}
-                                            />
-                                        </div>
-                                    </div>
+                                    
 
                                     <div className="row mt-2">
                                         <div className='col-3 my-auto'>
-                                            <label className="form-label my-auto">Inward Info</label>
+                                            <label className="form-label my-auto">Date & Time Of Issue</label>
                                         </div>
                                         <div className='col-3'>
-                                            <select
+                                            <input
+                                                type="date"
                                                 className="form-control form-control-sm py-1 px-2"
                                                 style={{ border: '1px solid #ced4da' }}
-                                            >
-                                                <option>No</option>
-                                                <option>Yes</option>
-                                            </select>
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -1046,8 +997,8 @@ export default function PoCapital() {
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6',
                                                 width: '15%'
-                                            }}>Assets Id</th>
-                                            <th colSpan="2" style={{
+                                            }}>Batch/Lot No.</th>
+                                            <th colSpan="1" style={{
                                                 padding: '12px',
                                                 textAlign: 'center',
                                                 fontWeight: '600',
@@ -1076,25 +1027,6 @@ export default function PoCapital() {
                                                 width: '8%'
                                             }}>Action</th>
                                         </tr>
-                                        <tr style={{
-                                            backgroundColor: '#e3f2fd',
-                                            border: '2px solid #dee2e6'
-                                        }}>
-                                            <th style={{ border: '1px solid #dee2e6' }}></th>
-                                            <th style={{ border: '1px solid #dee2e6' }}></th>
-                                            <th style={{
-                                                padding: '8px',
-                                                textAlign: 'center',
-                                                fontWeight: '600',
-                                                border: '1px solid #dee2e6'
-                                            }}>Actual</th>
-                                            <th style={{
-                                                padding: '8px',
-                                                textAlign: 'center',
-                                                fontWeight: '600',
-                                                border: '1px solid #dee2e6'
-                                            }}>Billed</th>
-                                        </tr>
                                     </thead>
                                     <tbody>
                                         {itemAllocationData.map((row, index) => (
@@ -1110,15 +1042,40 @@ export default function PoCapital() {
                                                         fontSize: '13px'
                                                     }}>
                                                         <div className="row align-items-center">
+
                                                             <div className="col-md-3">
                                                                 <span style={{
                                                                     fontStyle: 'italic',
                                                                     fontWeight: '500',
                                                                     color: '#495057'
                                                                 }}>
-                                                                    Tracking No. :
+                                                                    Order No. :
                                                                 </span>
                                                                 <select
+                                                                    className="form-control form-control-sm d-inline-block py-1 px-2"
+                                                                    value={row.orderNo}
+                                                                    onChange={(e) => handleItemAllocationChange(index, 'orderNo', e.target.value)}
+                                                                    style={{
+                                                                        width: 'auto',
+                                                                        display: 'inline-block',
+                                                                        marginLeft: '8px'
+                                                                    }}
+                                                                >
+                                                                    <option value="">Select Order</option>
+                                                                    <option value="Not Applicable">Not Applicable</option>
+                                                                    <option value="ORD001">ORD001</option>
+                                                                    <option value="ORD002">ORD002</option>
+                                                                </select>
+                                                            </div>
+                                                            <div className="col-md-3">
+                                                                <span className="my-auto" style={{
+                                                                    fontStyle: 'italic',
+                                                                    fontWeight: '500',
+                                                                    color: '#495057'
+                                                                }}>
+                                                                    Due On :
+                                                                </span>
+                                                                <input
                                                                     className="form-control form-control-sm d-inline-block py-1 px-2"
                                                                     value={row.trackingNo}
                                                                     onChange={(e) => handleItemAllocationChange(index, 'trackingNo', e.target.value)}
@@ -1127,12 +1084,7 @@ export default function PoCapital() {
                                                                         display: 'inline-block',
                                                                         marginLeft: '8px'
                                                                     }}
-                                                                >
-                                                                    <option value="">Select Tracking No.</option>
-                                                                    <option value="B1664">B1664</option>
-                                                                    <option value="B1665">B1665</option>
-                                                                    <option value="B1666">B1666</option>
-                                                                </select>
+                                                                />
                                                             </div>
                                                             <div className="col-md-3">
                                                                 <span style={{
@@ -1140,7 +1092,7 @@ export default function PoCapital() {
                                                                     fontWeight: '500',
                                                                     color: '#495057'
                                                                 }}>
-                                                                    Order No. :
+                                                                    Component Of :
                                                                 </span>
                                                                 <select
                                                                     className="form-control form-control-sm d-inline-block py-1 px-2"
@@ -1258,24 +1210,6 @@ export default function PoCapital() {
                                                     </td>
                                                     <td style={{
                                                         padding: '10px',
-                                                        border: '1px solid #dee2e6',
-                                                        textAlign: 'center'
-                                                    }}>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control form-control-sm"
-                                                            value={row.qcNo}
-                                                            onChange={(e) => handleItemAllocationChange(index, 'qcNo', e.target.value)}
-                                                            style={{
-                                                                border: '1px solid #ced4da',
-                                                                textAlign: 'center',
-                                                                fontSize: '13px',
-                                                                padding: '4px 8px'
-                                                            }}
-                                                        />
-                                                    </td>
-                                                    <td style={{
-                                                        padding: '10px',
                                                         border: '1px solid #dee2e6'
                                                     }}>
                                                         <div className="d-flex gap-2">
@@ -1346,41 +1280,19 @@ export default function PoCapital() {
 
 
             <div className="branches-page">
-                <div className="d-flex justify-content-between mb-2">
+                <div className="d-flex justify-content-between pb-3" style={{ borderBottom: '1px solid #e9ecef' }}>
                     <div style={{ fontSize: '20px' }}>
-                        Purchase Order
+                        Material Transfer
                     </div>
-                </div>
-                <div className="d-flex justify-content-between company-form pb-3"
-                    style={{
-                        borderBottom: '1px solid #eee',
-                        marginBottom: '25px',
-                        alignItems: 'center'
-                    }}
-                >
-                    <div className=''>
-                        <div className='row'>
-                            <div className='col-7 my-auto'>
-                                <label className="form-label">PO Capitals Goods Tangible No.</label>
-                            </div>
-                            <div className='col-5'>
-                                <input
-                                    type="text"
-                                    className="form-control form-control-sm"
-                                    style={{ border: '1px solid #ced4da' }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="">
+                    <div>
                         <div className="row">
-                            <div className='col-5 my-auto'>
-                                <label className="form-label">Date</label>
+                            <div className='col-4'>
+                                <label className="form-label my-auto">Date</label>
                             </div>
-                            <div className='col-7'>
+                            <div className='col-8'>
                                 <input
                                     type="date"
-                                    className="form-control form-control-sm"
+                                    className="form-control form-control-sm py-1 px-2"
                                     style={{ border: '1px solid #ced4da' }}
                                 />
                             </div>
@@ -1445,30 +1357,13 @@ export default function PoCapital() {
                             </div>
                         </div>
                     </div>
-                    <div className='col-3 mb-2'></div>
-                    <div className='col-3 mb-2'></div>
-                    <div className='col-3 mb-2'>
-                        <div className="row">
-                            <div className='col-5 my-auto'>
-                                <label className="form-label">Select SO No.</label>
-                            </div>
-                            <div className='col-7'>
-                                <select
-                                    className="form-control form-control-sm"
-                                    style={{ border: '1px solid #ced4da' }}
-                                >
-                                    <option>Select Party</option>
-                                    <option>Party 1</option>
-                                    <option>Party 2</option>
-                                    <option>Party 3</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div className='col-3 mb-2'></div>
-                    <div className='col-3 mb-2'></div>
-                    <div className='col-3 mb-2'></div>
-                    <div className='col-3 mb-2'>
+                    <div className='col-3'></div>
+                    <div className='col-3'></div>
+                    <div className='col-3'></div>
+                    <div className='col-3'></div>
+                    <div className='col-3'></div>
+                    <div className='col-3'></div>
+                    <div className='col-3'>
                         <div className="row">
                             <div className='col-5 my-auto'>
                                 <label className="form-label">Party A/c Name</label>
@@ -1493,19 +1388,19 @@ export default function PoCapital() {
                         >
                             Order Details
                         </button>
-                        <button
-                            className="btn btn-primary me-2"
+                        {/* <button
+                            className="btn btn-primary me-2 py-1 px-2"
                             onClick={openPartyDetailsDialog}
                         >
                             Party Details
-                        </button>
+                        </button> */}
                     </div>
                     <div className='col-3 mb-2'></div>
                     <div className='col-3 mb-2'></div>
                     <div className='col-3 mb-2'>
                         <div className="row">
                             <div className='col-5 my-auto'>
-                                <label className="form-label">Purchase Ledger</label>
+                                <label className="form-label">Destination Godown</label>
                             </div>
                             <div className='col-7'>
                                 <select
@@ -1520,14 +1415,28 @@ export default function PoCapital() {
                             </div>
                         </div>
                     </div>
-                    <div className='col-3 mb-2 offset-6'>
+                    <div className='col-3 mb-2 offset-3'>
                         <div className="row">
                             <div className='col-5 my-auto'>
-                                <label className="form-label">Order No.</label>
+                                <label className="form-label">Starting Date</label>
                             </div>
                             <div className='col-7'>
                                 <input
-                                    type="text"
+                                    type="date"
+                                    className="form-control form-control-sm"
+                                    style={{ border: '1px solid #ced4da' }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className='col-3 mb-2'>
+                        <div className="row">
+                            <div className='col-5 my-auto'>
+                                <label className="form-label">Target Date</label>
+                            </div>
+                            <div className='col-7'>
+                                <input
+                                    type="date"
                                     className="form-control form-control-sm"
                                     style={{ border: '1px solid #ced4da' }}
                                 />
@@ -1558,23 +1467,12 @@ export default function PoCapital() {
                                         }}>
                                             Name of Item
                                         </th>
-                                        <th className="bg-light" colSpan="2" style={{
+                                        <th className="bg-light" colSpan="1" style={{
                                             border: '1px solid #dee2e6',
-                                            padding: '0px 12px',
+                                            padding: '15px',
                                             fontWeight: '600',
-                                            textAlign: 'center'
                                         }}>
                                             Quantity
-                                            <div>
-                                                <tr style={{ backgroundColor: '#e3f2fd', textAlign: 'center', width: '100%' }}>
-                                                    <th className="bg-light" style={{ border: '1px solid #dee2e6', padding: '0px 12px', fontWeight: '600', width: '12%', textAlign: 'center' }}>
-                                                        Actual
-                                                    </th>
-                                                    <th className="bg-light" style={{ border: '1px solid #dee2e6', padding: '0px 12px', fontWeight: '600', width: '12%', textAlign: 'center' }}>
-                                                        Billed
-                                                    </th>
-                                                </tr>
-                                            </div>
                                         </th>
                                         <th className="bg-light" rowSpan="2" style={{
                                             border: '1px solid #dee2e6',
@@ -1626,22 +1524,6 @@ export default function PoCapital() {
                                                     <option value="Network Switch">Network Switch</option>
                                                     <option value="Router Device">Router Device</option>
                                                 </select>
-                                            </td>
-                                            <td style={{
-                                                border: '1px solid #dee2e6',
-                                                padding: '12px'
-                                            }}>
-                                                <input
-                                                    type="text"
-                                                    className="form-control form-control-sm"
-                                                    // value={row.quantityActual}
-                                                    onChange={(e) => handleTableDataChange(index, 'quantityActual', e.target.value)}
-
-                                                    style={{
-                                                        border: '1px solid #ced4da',
-                                                        textAlign: 'center'
-                                                    }}
-                                                />
                                             </td>
                                             <td style={{
                                                 border: '1px solid #dee2e6',
@@ -1752,7 +1634,7 @@ export default function PoCapital() {
                                 border: 'none'
                             }}
                         >
-                            Save GRN
+                            Save
                         </button>
                     </div>
                 </div>

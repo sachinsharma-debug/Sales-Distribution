@@ -1,24 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./Branches.css";
-import ReactDOM from 'react-dom';
-import Modal from 'react-modal';
+import ReactDOM from "react-dom";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
 import { BASE_URL } from "../../api/common";
 import { Country, State, City } from "country-state-city";
-
-const CustomStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    maxWidth: '90vw',
-    width: 'auto',
-    maxHeight: '90vh',
-    overflow: 'auto'
-  },
-};
 
 const Branches = () => {
   // Search filters state
@@ -33,19 +21,19 @@ const Branches = () => {
   });
 
   const [formobj, setformobj] = useState({
-    "MasterID": "",
-    "AlterID": "",
-    "BranchName": "",
-    "MailingName": "",
-    "Address": "",
-    "District": "",
-    "State": "",
-    "Country": "",
-    "Pincode": "",
-    "Telephone": "",
-    "Mobile": "",
-    "Fax": "",
-    "Email": ""
+    MasterID: "",
+    AlterID: "",
+    BranchName: "",
+    MailingName: "",
+    Address: "",
+    District: "",
+    State: "",
+    Country: "",
+    Pincode: "",
+    Telephone: "",
+    Mobile: "",
+    Fax: "",
+    Email: "",
   });
 
   // Validation errors state
@@ -54,7 +42,7 @@ const Branches = () => {
     Telephone: "",
     Mobile: "",
     Fax: "",
-    Email: ""
+    Email: "",
   });
 
   // State for countries, states, and cities
@@ -74,12 +62,12 @@ const Branches = () => {
     if (formobj.Country) {
       const stateData = State.getStatesOfCountry(formobj.Country);
       setStates(stateData);
-      
+
       // Reset state and city when country changes
-      setformobj(prev => ({
+      setformobj((prev) => ({
         ...prev,
         State: "",
-        District: ""
+        District: "",
       }));
       setCities([]);
     } else {
@@ -93,11 +81,11 @@ const Branches = () => {
     if (formobj.Country && formobj.State) {
       const cityData = City.getCitiesOfState(formobj.Country, formobj.State);
       setCities(cityData);
-      
+
       // Reset city when state changes
-      setformobj(prev => ({
+      setformobj((prev) => ({
         ...prev,
-        District: ""
+        District: "",
       }));
     } else {
       setCities([]);
@@ -134,7 +122,9 @@ const Branches = () => {
   const validatePhone = (value, fieldName) => {
     if (!value) return "";
     const phoneRegex = /^[\d\s\+\-\(\)]{5,15}$/;
-    return phoneRegex.test(value) ? "" : `${fieldName} should be 5-15 digits with optional + - ( )`;
+    return phoneRegex.test(value)
+      ? ""
+      : `${fieldName} should be 5-15 digits with optional + - ( )`;
   };
 
   const validateEmail = (value) => {
@@ -145,14 +135,14 @@ const Branches = () => {
 
   // Handle input changes with validation
   const handleInputChange = (field, value) => {
-    setformobj(prev => ({
+    setformobj((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
 
     // Validate the field
     let error = "";
-    switch(field) {
+    switch (field) {
       case "Pincode":
         error = validatePincode(value);
         break;
@@ -172,15 +162,15 @@ const Branches = () => {
         break;
     }
 
-    setValidationErrors(prev => ({
+    setValidationErrors((prev) => ({
       ...prev,
-      [field]: error
+      [field]: error,
     }));
   };
 
   // Check if form has validation errors
   const hasValidationErrors = () => {
-    return Object.values(validationErrors).some(error => error !== "");
+    return Object.values(validationErrors).some((error) => error !== "");
   };
 
   async function addupdate() {
@@ -192,8 +182,8 @@ const Branches = () => {
 
     let payload = {
       tablename: "branch",
-      data: formobj
-    }
+      data: formobj,
+    };
 
     try {
       let response = await fetch(BASE_URL + "create_master", {
@@ -205,302 +195,497 @@ const Branches = () => {
       });
       response = await response.json();
       getmethod();
-      closeModal();
+      closeDialog();
     } catch (error) {
       console.error("Error creating/updating branch:", error);
     }
   }
 
   // Filter branches based on search criteria
-  const filteredBranches = branchesData.filter(branch => {
+  const filteredBranches = branchesData.filter((branch) => {
     return (
-      branch.BranchName.toLowerCase().includes(searchFilters.name.toLowerCase()) &&
-      branch.MailingName.toLowerCase().includes(searchFilters.parentName.toLowerCase()) &&
-      (branch.Address || "").toLowerCase().includes(searchFilters.address.toLowerCase()) &&
-      (branch.Telephone || "").toLowerCase().includes(searchFilters.phone.toLowerCase()) &&
-      (branch.Mobile || "").toLowerCase().includes(searchFilters.mobile.toLowerCase()) &&
-      (branch.Email || "").toLowerCase().includes(searchFilters.email.toLowerCase())
+      branch.BranchName.toLowerCase().includes(
+        searchFilters.name.toLowerCase()
+      ) &&
+      branch.MailingName.toLowerCase().includes(
+        searchFilters.parentName.toLowerCase()
+      ) &&
+      (branch.Address || "")
+        .toLowerCase()
+        .includes(searchFilters.address.toLowerCase()) &&
+      (branch.Telephone || "")
+        .toLowerCase()
+        .includes(searchFilters.phone.toLowerCase()) &&
+      (branch.Mobile || "")
+        .toLowerCase()
+        .includes(searchFilters.mobile.toLowerCase()) &&
+      (branch.Email || "")
+        .toLowerCase()
+        .includes(searchFilters.email.toLowerCase())
     );
   });
 
   let subtitle;
-  const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [fetchFromPincode, setFetchFromPincode] = useState(false);
+  const [pincodeDialogOpen, setPincodeDialogOpen] = useState(false);
+  const [pincodeDialogValue, setPincodeDialogValue] = useState("");
 
-  function openModal() {
-    setIsOpen(true);
-    // Reset form and validation errors when opening modal for new entry
+  function openDialog() {
+    setDialogOpen(true);
+    // Reset form and validation errors when opening dialog for new entry
     setformobj({
-      "MasterID": "",
-      "AlterID": "",
-      "BranchName": "",
-      "MailingName": "",
-      "Address": "",
-      "District": "",
-      "State": "",
-      "Country": "",
-      "Pincode": "",
-      "Telephone": "",
-      "Mobile": "",
-      "Fax": "",
-      "Email": ""
+      MasterID: "",
+      AlterID: "",
+      BranchName: "",
+      MailingName: "",
+      Address: "",
+      District: "",
+      State: "",
+      Country: "",
+      Pincode: "",
+      Telephone: "",
+      Mobile: "",
+      Fax: "",
+      Email: "",
     });
-    
+
     setValidationErrors({
       Pincode: "",
       Telephone: "",
       Mobile: "",
       Fax: "",
-      Email: ""
+      Email: "",
     });
   }
 
-  function afterOpenModal() {
-    // references are now sync'd and can be accessed.
+  function closeDialog() {
+    setDialogOpen(false);
   }
 
-  function closeModal() {
-    setIsOpen(false);
+  function openPincodeDialog() {
+    setPincodeDialogValue(formobj.Pincode || "");
+    setPincodeDialogOpen(true);
+  }
+
+  function closePincodeDialog() {
+    setPincodeDialogOpen(false);
+  }
+
+  function confirmPincodeDialog() {
+    // Use handleInputChange so validation runs
+    handleInputChange("Pincode", pincodeDialogValue);
+    setPincodeDialogOpen(false);
   }
 
   return (
     <>
-      <Modal
-        isOpen={modalIsOpen}
-        onAfterOpen={afterOpenModal}
-        onRequestClose={closeModal}
-        style={CustomStyles}
-        contentLabel="Branch Modal"
-        ariaHideApp={false}
+      <Dialog
+        open={dialogOpen}
+        onClose={closeDialog}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          style: {
+            maxHeight: "95vh",
+            overflow: "auto",
+            maxWidth: "700px",
+          },
+        }}
       >
-        <div className="d-flex justify-content-between pb-2" style={{ borderBottom: '1px solid #eee' }}>
-          <div style={{ fontSize: 20 }}>Add Branch</div>
-          <div className="my-auto">
-            <button 
-              type="submit" 
-              className="btn btn-primary"
-              onClick={addupdate}
-              disabled={hasValidationErrors()}
-            >Add</button>
-          </div>
-        </div>
-        <form className="mt-2 branch-form" style={{ maxHeight: '500px', overflowY: 'auto' }}>
-          <div className="row">
-            <div className="col-12">
-              <div className="mt-3 row">
-                <div className="col-4 my-auto">
-                  <label htmlFor="MasterID" className="form-label">Master ID</label>
-                </div>
-                <div className="col-8">
-                  <input 
-                    type="text"
-                    value={formobj.MasterID}
-                    onChange={(e) => handleInputChange("MasterID", e.target.value)}
-                    className="form-control" 
-                    id="MasterID" 
-                  />
-                </div>
-                
-                <div className="col-4 my-auto">
-                  <label htmlFor="AlterID" className="form-label">Alter ID</label>
-                </div>
-                <div className="col-8">
-                  <input 
-                    type="text"
-                    value={formobj.AlterID}
-                    onChange={(e) => handleInputChange("AlterID", e.target.value)}
-                    className="form-control" 
-                    id="AlterID" 
-                  />
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label htmlFor="BranchName" className="form-label">Branch Name</label>
-                </div>
-                <div className="col-8">
-                  <input 
-                    type="text"
-                    value={formobj.BranchName}
-                    onChange={(e) => handleInputChange("BranchName", e.target.value)}
-                    className="form-control" 
-                    id="BranchName" 
-                  />
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label htmlFor="MailingName" className="form-label">Mailing Name</label>
-                </div>
-                <div className="col-8">
-                  <input 
-                    type="text"
-                    value={formobj.MailingName}
-                    onChange={(e) => handleInputChange("MailingName", e.target.value)}
-                    className="form-control" 
-                    id="MailingName" 
-                  />
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label className="form-label" htmlFor="Address">Address</label>
-                </div>
-                <div className="col-8">
-                  <textarea
-                    value={formobj.Address}
-                    onChange={(e) => handleInputChange("Address", e.target.value)}
-                    className="form-control w-100" 
-                    id="Address" 
-                  />
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label htmlFor="Country" className="form-label">Country</label>
-                </div>
-                <div className="col-8 my-1">
-                  <select
-                    value={formobj.Country}
-                    onChange={(e) => handleInputChange("Country", e.target.value)}
-                    id="Country" 
-                    className="form-select w-100"
-                  >
-                    <option value="">Select Country</option>
-                    {countries.map((country) => (
-                      <option key={country.isoCode} value={country.isoCode}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label htmlFor="State" className="form-label">State</label>
-                </div>
-                <div className="col-8">
-                  <select
-                    value={formobj.State}
-                    onChange={(e) => handleInputChange("State", e.target.value)}
-                    id="State" 
-                    className="form-select w-100"
-                    disabled={!formobj.Country}
-                  >
-                    <option value="">Select State</option>
-                    {states.map((state) => (
-                      <option key={state.isoCode} value={state.isoCode}>
-                        {state.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label htmlFor="District" className="form-label">City</label>
-                </div>
-                <div className="col-8">
-                  <select
-                    value={formobj.District}
-                    onChange={(e) => handleInputChange("District", e.target.value)}
-                    id="District" 
-                    className="form-select w-100"
-                    disabled={!formobj.State}
-                  >
-                    <option value="">Select City</option>
-                    {cities.map((city) => (
-                      <option key={city.name} value={city.name}>
-                        {city.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label htmlFor="Pincode" className="form-label">Pincode</label>
-                </div>
-                <div className="col-8">
-                  <input 
-                    type="text"
-                    value={formobj.Pincode}
-                    onChange={(e) => handleInputChange("Pincode", e.target.value)}
-                    className={`form-control ${validationErrors.Pincode ? 'is-invalid' : ''}`} 
-                    id="Pincode" 
-                  />
-                  {validationErrors.Pincode && (
-                    <div className="invalid-feedback">{validationErrors.Pincode}</div>
-                  )}
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label htmlFor="Telephone" className="form-label">Telephone</label>
-                </div>
-                <div className="col-8">
-                  <input 
-                    type="text"
-                    value={formobj.Telephone}
-                    onChange={(e) => handleInputChange("Telephone", e.target.value)}
-                    className={`form-control ${validationErrors.Telephone ? 'is-invalid' : ''}`} 
-                    id="Telephone" 
-                  />
-                  {validationErrors.Telephone && (
-                    <div className="invalid-feedback">{validationErrors.Telephone}</div>
-                  )}
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label htmlFor="Mobile" className="form-label">Mobile</label>
-                </div>
-                <div className="col-8">
-                  <input 
-                    type="text"
-                    value={formobj.Mobile}
-                    onChange={(e) => handleInputChange("Mobile", e.target.value)}
-                    className={`form-control ${validationErrors.Mobile ? 'is-invalid' : ''}`} 
-                    id="Mobile" 
-                  />
-                  {validationErrors.Mobile && (
-                    <div className="invalid-feedback">{validationErrors.Mobile}</div>
-                  )}
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label htmlFor="Fax" className="form-label">Fax</label>
-                </div>
-                <div className="col-8">
-                  <input 
-                    type="text"
-                    value={formobj.Fax}
-                    onChange={(e) => handleInputChange("Fax", e.target.value)}
-                    className={`form-control ${validationErrors.Fax ? 'is-invalid' : ''}`} 
-                    id="Fax" 
-                  />
-                  {validationErrors.Fax && (
-                    <div className="invalid-feedback">{validationErrors.Fax}</div>
-                  )}
-                </div>
-
-                <div className="col-4 my-auto">
-                  <label htmlFor="Email" className="form-label">Email</label>
-                </div>
-                <div className="col-8">
-                  <input 
-                    type="text"
-                    value={formobj.Email}
-                    onChange={(e) => handleInputChange("Email", e.target.value)}
-                    className={`form-control ${validationErrors.Email ? 'is-invalid' : ''}`} 
-                    id="Email" 
-                  />
-                  {validationErrors.Email && (
-                    <div className="invalid-feedback">{validationErrors.Email}</div>
-                  )}
-                </div>
+        <DialogTitle>
+          <div className="d-flex justify-content-between align-items-center">
+            <div style={{ fontSize: 20 }}>Add Branch</div>
+            <div className="d-flex gap-3 align-items-center">
+              <div className="d-flex align-items-center gap-2">
+                <label
+                  htmlFor="MasterID"
+                  className="form-label mb-0"
+                  style={{ fontSize: 14 }}
+                >
+                  Master ID:
+                </label>
+                <input
+                  type="text"
+                  value={formobj.MasterID}
+                  onChange={(e) =>
+                    handleInputChange("MasterID", e.target.value)
+                  }
+                  className="form-control"
+                  id="MasterID"
+                  style={{ width: "100px", height: "32px" }}
+                />
+              </div>
+              <div className="d-flex align-items-center gap-2">
+                <label
+                  htmlFor="AlterID"
+                  className="form-label mb-0"
+                  style={{ fontSize: 14 }}
+                >
+                  Alter ID:
+                </label>
+                <input
+                  type="text"
+                  value={formobj.AlterID}
+                  onChange={(e) => handleInputChange("AlterID", e.target.value)}
+                  className="form-control"
+                  id="AlterID"
+                  style={{ width: "100px", height: "32px" }}
+                />
               </div>
             </div>
           </div>
-        </form>
-      </Modal>
-      
+        </DialogTitle>
+        <DialogContent>
+          <form className="mt-2 branch-form">
+            <div className="row">
+              <div className="col-12">
+                <div className="mt-3 row">
+                  <div className="col-4 my-auto">
+                    <label htmlFor="BranchName" className="form-label">
+                      Branch Name
+                    </label>
+                  </div>
+                  <div className="col-8">
+                    <input
+                      type="text"
+                      value={formobj.BranchName}
+                      onChange={(e) =>
+                        handleInputChange("BranchName", e.target.value)
+                      }
+                      className="form-control"
+                      id="BranchName"
+                    />
+                  </div>
+
+                  <div className="col-4 my-auto">
+                    <label htmlFor="MailingName" className="form-label">
+                      Mailing Name
+                    </label>
+                  </div>
+                  <div className="col-8">
+                    <input
+                      type="text"
+                      value={formobj.MailingName}
+                      onChange={(e) =>
+                        handleInputChange("MailingName", e.target.value)
+                      }
+                      className="form-control"
+                      id="MailingName"
+                    />
+                  </div>
+
+                  <div className="col-4 my-auto">
+                    <label className="form-label" htmlFor="Address">
+                      Address
+                    </label>
+                  </div>
+                  <div className="col-8">
+                    <textarea
+                      value={formobj.Address}
+                      onChange={(e) =>
+                        handleInputChange("Address", e.target.value)
+                      }
+                      className="form-control w-100"
+                      id="Address"
+                    />
+                  </div>
+                  <div className="col-4 my-auto">
+                    <label className="form-label">Fetch from Pincode</label>
+                  </div>
+                  <div
+                    className="col-8 d-flex align-items-center"
+                    style={{ gap: "8px" }}
+                  >
+                    <div className="form-check form-switch">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="fetchFromPincode"
+                        checked={fetchFromPincode}
+                        onChange={(e) => setFetchFromPincode(e.target.checked)}
+                      />
+                      <label
+                        className="form-check-label ms-2"
+                        htmlFor="fetchFromPincode"
+                      >
+                        Yes
+                      </label>
+                    </div>
+                    {fetchFromPincode && (
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary btn-sm"
+                        style={{
+                          padding: "3px 8px",
+                          fontSize: "0.75rem",
+                          lineHeight: "1",
+                        }}
+                        onClick={openPincodeDialog}
+                      >
+                        Set
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="col-4 my-auto">
+                    <label htmlFor="Country" className="form-label">
+                      Country
+                    </label>
+                  </div>
+                  <div className="col-8 my-1">
+                    <select
+                      value={formobj.Country}
+                      onChange={(e) =>
+                        handleInputChange("Country", e.target.value)
+                      }
+                      id="Country"
+                      className="form-select w-100"
+                    >
+                      <option value="">Select Country</option>
+                      {countries.map((country) => (
+                        <option key={country.isoCode} value={country.isoCode}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="col-4 my-auto">
+                    <label htmlFor="State" className="form-label">
+                      State
+                    </label>
+                  </div>
+                  <div className="col-8">
+                    <select
+                      value={formobj.State}
+                      onChange={(e) =>
+                        handleInputChange("State", e.target.value)
+                      }
+                      id="State"
+                      className="form-select w-100"
+                      disabled={!formobj.Country}
+                    >
+                      <option value="">Select State</option>
+                      {states.map((state) => (
+                        <option key={state.isoCode} value={state.isoCode}>
+                          {state.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="col-4 my-auto">
+                    <label htmlFor="District" className="form-label">
+                      City
+                    </label>
+                  </div>
+                  <div className="col-8">
+                    <select
+                      value={formobj.District}
+                      onChange={(e) =>
+                        handleInputChange("District", e.target.value)
+                      }
+                      id="District"
+                      className="form-select w-100"
+                      disabled={!formobj.State}
+                    >
+                      <option value="">Select City</option>
+                      {cities.map((city) => (
+                        <option key={city.name} value={city.name}>
+                          {city.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="col-4 my-auto">
+                    <label htmlFor="Pincode" className="form-label">
+                      Pincode
+                    </label>
+                  </div>
+                  <div className="col-8">
+                    <input
+                      type="text"
+                      value={formobj.Pincode}
+                      onChange={(e) =>
+                        handleInputChange("Pincode", e.target.value)
+                      }
+                      className={`form-control ${
+                        validationErrors.Pincode ? "is-invalid" : ""
+                      }`}
+                      id="Pincode"
+                    />
+                    {validationErrors.Pincode && (
+                      <div className="invalid-feedback">
+                        {validationErrors.Pincode}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="col-4 my-auto">
+                    <label htmlFor="Telephone" className="form-label">
+                      Telephone
+                    </label>
+                  </div>
+                  <div className="col-8">
+                    <input
+                      type="text"
+                      value={formobj.Telephone}
+                      onChange={(e) =>
+                        handleInputChange("Telephone", e.target.value)
+                      }
+                      className={`form-control ${
+                        validationErrors.Telephone ? "is-invalid" : ""
+                      }`}
+                      id="Telephone"
+                    />
+                    {validationErrors.Telephone && (
+                      <div className="invalid-feedback">
+                        {validationErrors.Telephone}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="col-4 my-auto">
+                    <label htmlFor="Mobile" className="form-label">
+                      Mobile
+                    </label>
+                  </div>
+                  <div className="col-8">
+                    <input
+                      type="text"
+                      value={formobj.Mobile}
+                      onChange={(e) =>
+                        handleInputChange("Mobile", e.target.value)
+                      }
+                      className={`form-control ${
+                        validationErrors.Mobile ? "is-invalid" : ""
+                      }`}
+                      id="Mobile"
+                    />
+                    {validationErrors.Mobile && (
+                      <div className="invalid-feedback">
+                        {validationErrors.Mobile}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="col-4 my-auto">
+                    <label htmlFor="Fax" className="form-label">
+                      Fax
+                    </label>
+                  </div>
+                  <div className="col-8">
+                    <input
+                      type="text"
+                      value={formobj.Fax}
+                      onChange={(e) => handleInputChange("Fax", e.target.value)}
+                      className={`form-control ${
+                        validationErrors.Fax ? "is-invalid" : ""
+                      }`}
+                      id="Fax"
+                    />
+                    {validationErrors.Fax && (
+                      <div className="invalid-feedback">
+                        {validationErrors.Fax}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="col-4 my-auto">
+                    <label htmlFor="Email" className="form-label">
+                      Email
+                    </label>
+                  </div>
+                  <div className="col-8">
+                    <input
+                      type="text"
+                      value={formobj.Email}
+                      onChange={(e) =>
+                        handleInputChange("Email", e.target.value)
+                      }
+                      className={`form-control ${
+                        validationErrors.Email ? "is-invalid" : ""
+                      }`}
+                      id="Email"
+                    />
+                    {validationErrors.Email && (
+                      <div className="invalid-feedback">
+                        {validationErrors.Email}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={closeDialog}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={addupdate}
+            disabled={hasValidationErrors()}
+          >
+            Add
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Pincode setter dialog */}
+      <Dialog
+        open={pincodeDialogOpen}
+        onClose={closePincodeDialog}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ style: { padding: 12 } }}
+      >
+        <DialogTitle>Set Pincode</DialogTitle>
+        <DialogContent>
+          <div className="mb-2">
+            <label htmlFor="pincodeDialogInput" className="form-label">
+              Pincode
+            </label>
+            <input
+              id="pincodeDialogInput"
+              type="text"
+              className={`form-control ${
+                validationErrors.Pincode ? "is-invalid" : ""
+              }`}
+              value={pincodeDialogValue}
+              onChange={(e) => setPincodeDialogValue(e.target.value)}
+            />
+            {validationErrors.Pincode && (
+              <div className="invalid-feedback">{validationErrors.Pincode}</div>
+            )}
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <button className="btn btn-secondary" onClick={closePincodeDialog}>
+            Cancel
+          </button>
+          <button className="btn btn-primary" onClick={confirmPincodeDialog}>
+            Set
+          </button>
+        </DialogActions>
+      </Dialog>
+
       <div className="branches-page">
         <div className="branches-header">
           <h2>Branches</h2>
-          <button onClick={openModal} className="btn btn-primary new-btn">Add Branch</button>
+          <button onClick={openDialog} className="btn btn-primary new-btn">
+            Add Branch
+          </button>
         </div>
-        
+
         <div className="pagination-container">
           <div className="entries-info">
             <select className="entries-select">
@@ -527,7 +712,7 @@ const Branches = () => {
             <button className="page-btn">»</button>
           </div>
         </div>
-        
+
         <div className="companies-table-container">
           <table className="companies-table">
             <thead>
@@ -556,7 +741,9 @@ const Branches = () => {
                     className="search-input"
                     placeholder="Search mailing name..."
                     value={searchFilters.parentName}
-                    onChange={(e) => handleSearchChange("parentName", e.target.value)}
+                    onChange={(e) =>
+                      handleSearchChange("parentName", e.target.value)
+                    }
                   />
                 </th>
                 <th>
@@ -565,7 +752,9 @@ const Branches = () => {
                     className="search-input"
                     placeholder="Search state..."
                     value={searchFilters.address}
-                    onChange={(e) => handleSearchChange("address", e.target.value)}
+                    onChange={(e) =>
+                      handleSearchChange("address", e.target.value)
+                    }
                   />
                 </th>
                 <th>
@@ -574,7 +763,9 @@ const Branches = () => {
                     className="search-input"
                     placeholder="Search city..."
                     value={searchFilters.phone}
-                    onChange={(e) => handleSearchChange("phone", e.target.value)}
+                    onChange={(e) =>
+                      handleSearchChange("phone", e.target.value)
+                    }
                   />
                 </th>
                 <th>
@@ -583,7 +774,9 @@ const Branches = () => {
                     className="search-input"
                     placeholder="Search mobile..."
                     value={searchFilters.mobile}
-                    onChange={(e) => handleSearchChange("mobile", e.target.value)}
+                    onChange={(e) =>
+                      handleSearchChange("mobile", e.target.value)
+                    }
                   />
                 </th>
                 <th>
@@ -592,7 +785,9 @@ const Branches = () => {
                     className="search-input"
                     placeholder="Search email..."
                     value={searchFilters.email}
-                    onChange={(e) => handleSearchChange("email", e.target.value)}
+                    onChange={(e) =>
+                      handleSearchChange("email", e.target.value)
+                    }
                   />
                 </th>
                 <th></th>
@@ -608,11 +803,11 @@ const Branches = () => {
                   <td>{branch.Mobile}</td>
                   <td>{branch.Email}</td>
                   <td>
-                    <button 
+                    <button
                       className="btn btn-sm btn-outline-primary"
                       onClick={() => {
                         setformobj(branch);
-                        setIsOpen(true);
+                        setDialogOpen(true);
                       }}
                     >
                       Edit

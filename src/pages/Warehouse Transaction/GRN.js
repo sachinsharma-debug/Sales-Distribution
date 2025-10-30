@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from "react";
 import "../Settings/Branches.css";
 import { BASE_URL } from "../../api/common";
@@ -34,6 +36,7 @@ const GRN = () => {
     const [secondDialogOpen, setSecondDialogOpen] = useState(false);
     const [orderDetailsDialogOpen, setOrderDetailsDialogOpen] = useState(false);
     const [itemAllocationDialogOpen, setItemAllocationDialogOpen] = useState(false);
+    const [partyDetailsDialogOpen, setPartyDetailsDialogOpen] = useState(false);
     const [selectedName, setSelectedName] = useState("");
     const [selectedItem, setSelectedItem] = useState("");
     const [SalesEnquiryData, setSalesEnquiryData] = useState([]);
@@ -117,6 +120,7 @@ const GRN = () => {
         setSecondDialogOpen(false);
         setOrderDetailsDialogOpen(false);
         setItemAllocationDialogOpen(false);
+        setPartyDetailsDialogOpen(false);
         setSelectedName("");
         setSelectedItem("");
     }
@@ -147,6 +151,14 @@ const GRN = () => {
         setSelectedItem("");
     }
 
+    function openPartyDetailsDialog() {
+        setPartyDetailsDialogOpen(true);
+    }
+
+    function closePartyDetailsDialog() {
+        setPartyDetailsDialogOpen(false);
+    }
+
     // Handle name selection
     const handleNameSelect = (e) => {
         const selectedValue = e.target.value;
@@ -164,7 +176,7 @@ const GRN = () => {
         if (value) {
             openItemAllocationDialog(value);
         }
-        
+
         const updatedData = [...tableData];
         updatedData[index] = {
             ...updatedData[index],
@@ -173,7 +185,7 @@ const GRN = () => {
         setTableData(updatedData);
     };
 
-    // Dialog backdrop close handler
+    // Dialog backdrop close handlers
     const handleBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
             closeDialog();
@@ -195,6 +207,12 @@ const GRN = () => {
     const handleItemAllocationBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
             closeItemAllocationDialog();
+        }
+    };
+
+    const handlePartyDetailsBackdropClick = (e) => {
+        if (e.target === e.currentTarget) {
+            closePartyDetailsDialog();
         }
     };
 
@@ -273,6 +291,8 @@ const GRN = () => {
                     closeItemAllocationDialog();
                 } else if (orderDetailsDialogOpen) {
                     closeOrderDetailsDialog();
+                } else if (partyDetailsDialogOpen) {
+                    closePartyDetailsDialog();
                 } else if (secondDialogOpen) {
                     closeSecondDialog();
                 } else if (dialogOpen) {
@@ -285,7 +305,7 @@ const GRN = () => {
         return () => {
             document.removeEventListener('keydown', handleEscKey);
         };
-    }, [dialogOpen, secondDialogOpen, orderDetailsDialogOpen, itemAllocationDialogOpen]);
+    }, [dialogOpen, secondDialogOpen, orderDetailsDialogOpen, itemAllocationDialogOpen, partyDetailsDialogOpen]);
 
     return (
         <>
@@ -507,12 +527,18 @@ const GRN = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className='col-3 mb-2'>
+                                <div className='col-3 mb-2 d-flex'>
                                     <button
-                                        className="btn btn-primary me-2"
+                                        className="btn btn-primary me-2 py-1 px-2"
                                         onClick={openOrderDetailsDialog}
                                     >
                                         Order Details
+                                    </button>
+                                    <button
+                                        className="btn btn-primary me-2 py-1 px-2"
+                                        onClick={openPartyDetailsDialog}
+                                    >
+                                        Party Details
                                     </button>
                                 </div>
                                 <div className='col-3 mb-2'></div>
@@ -1038,6 +1064,366 @@ const GRN = () => {
                 </div>
             )}
 
+            {/* Party Details Dialog */}
+            {partyDetailsDialogOpen && (
+                <div
+                    className="dialog-backdrop"
+                    onClick={handlePartyDetailsBackdropClick}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1003,
+                    }}
+                >
+                    <div
+                        className="dialog-content"
+                        style={{
+                            background: 'white',
+                            borderRadius: '8px',
+                            padding: '25px',
+                            minWidth: '1000px',
+                            maxWidth: '90vw',
+                            maxHeight: '90vh',
+                            overflow: 'auto',
+                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+                        }}
+                    >
+                        <div className="d-flex justify-content-between mb-3"
+                            style={{ borderBottom: '1px solid #eee', paddingBottom: '15px' }}
+                        >
+                            <div style={{ fontSize: '20px', fontWeight: 'bold' }}>
+                                Party Details
+                            </div>
+                            <button
+                                onClick={closePartyDetailsDialog}
+                                style={{
+                                    border: 'none',
+                                    background: 'none',
+                                    fontSize: '18px',
+                                    cursor: 'pointer',
+                                    color: '#6c757d',
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div className="dialog-body">
+                            <div className="row">
+                                <div className="col-6">
+                                    <div className="row">
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">Supplier Bill From</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>AM Electronics</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">Address Type</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Primary</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label">Mailing Name</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label">Address</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <textarea
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">State</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Primary</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">Country</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Primary</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">District</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Primary</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">City</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Primary</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label">Pincode</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">GST Registration Type</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Unknown</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">Assessee Of Other Territory</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>No</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label">GSTIN/UIN</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-6">
+                                    <div className="row">
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">Consignee (Ship To)</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>No</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">Address Type</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Primary</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label">Mailing Name</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label">Address</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <textarea
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">State</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Primary</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">Country</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Primary</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">District</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Primary</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label my-auto">City</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <select
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            >
+                                                <option>Primary</option>
+                                                <option>Yes</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label">Pincode</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+
+                                        <div className='col-5 mt-1'>
+                                            <label className="form-label">GSTIN/UIN</label>
+                                        </div>
+                                        <div className='col-7 mt-1'>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm py-1 px-2"
+                                                style={{ border: '1px solid #ced4da' }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Footer Buttons */}
+                            <div className="d-flex justify-content-end mt-4 pt-3" style={{ borderTop: '1px solid #e9ecef' }}>
+                                <button
+                                    className="btn btn-outline-secondary me-3"
+                                    onClick={closePartyDetailsDialog}
+                                    style={{
+                                        padding: '8px 24px',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    Close
+                                </button>
+                                <button
+                                    className="btn btn-primary"
+                                    style={{
+                                        padding: '8px 24px',
+                                        fontWeight: '600',
+                                        background: '#007bff',
+                                        border: 'none'
+                                    }}
+                                >
+                                    Save Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Item Allocation Dialog - Exact match to image */}
             {itemAllocationDialogOpen && (
                 <div
@@ -1053,7 +1439,7 @@ const GRN = () => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        zIndex: 1003,
+                        zIndex: 1004,
                     }}
                 >
                     <div
@@ -1092,95 +1478,95 @@ const GRN = () => {
                         <div className="dialog-body">
                             {/* Item Allocation Table */}
                             <div className="table-responsive">
-                                <table className="table table-bordered" style={{ 
+                                <table className="table table-bordered" style={{
                                     fontSize: '14px',
                                     border: '2px solid #dee2e6'
                                 }}>
                                     <thead>
-                                        <tr style={{ 
-                                            backgroundColor: '#007bff', 
+                                        <tr style={{
+                                            backgroundColor: '#007bff',
                                             color: 'white',
                                             border: '2px solid #dee2e6'
                                         }}>
-                                            <th style={{ 
-                                                padding: '12px', 
-                                                textAlign: 'center', 
+                                            <th style={{
+                                                padding: '12px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6',
                                                 width: '12%'
                                             }}>Godown</th>
-                                            <th style={{ 
-                                                padding: '12px', 
-                                                textAlign: 'center', 
+                                            <th style={{
+                                                padding: '12px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6',
                                                 width: '15%'
                                             }}>Batch/Lot No.</th>
-                                            <th colSpan="2" style={{ 
-                                                padding: '12px', 
-                                                textAlign: 'center', 
+                                            <th colSpan="2" style={{
+                                                padding: '12px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6',
                                                 width: '16%'
                                             }}>Quantity</th>
-                                            <th style={{ 
-                                                padding: '12px', 
-                                                textAlign: 'center', 
+                                            <th style={{
+                                                padding: '12px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6',
                                                 width: '8%'
                                             }}>QC Test</th>
-                                            <th style={{ 
-                                                padding: '12px', 
-                                                textAlign: 'center', 
+                                            <th style={{
+                                                padding: '12px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6',
                                                 width: '8%'
                                             }}>QC No</th>
-                                            <th style={{ 
-                                                padding: '12px', 
-                                                textAlign: 'center', 
+                                            <th style={{
+                                                padding: '12px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6',
                                                 width: '10%'
                                             }}>QC Date</th>
-                                            <th style={{ 
-                                                padding: '12px', 
-                                                textAlign: 'center', 
+                                            <th style={{
+                                                padding: '12px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6',
                                                 width: '15%'
                                             }}>Inspection Observation</th>
-                                            <th style={{ 
-                                                padding: '12px', 
-                                                textAlign: 'center', 
+                                            <th style={{
+                                                padding: '12px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6',
                                                 width: '10%'
                                             }}>Ins Date</th>
-                                            <th style={{ 
-                                                padding: '12px', 
-                                                textAlign: 'center', 
+                                            <th style={{
+                                                padding: '12px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6',
                                                 width: '8%'
                                             }}>Action</th>
                                         </tr>
-                                        <tr style={{ 
+                                        <tr style={{
                                             backgroundColor: '#e3f2fd',
                                             border: '2px solid #dee2e6'
                                         }}>
                                             <th style={{ border: '1px solid #dee2e6' }}></th>
                                             <th style={{ border: '1px solid #dee2e6' }}></th>
-                                            <th style={{ 
-                                                padding: '8px', 
-                                                textAlign: 'center', 
+                                            <th style={{
+                                                padding: '8px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6'
                                             }}>Actual</th>
-                                            <th style={{ 
-                                                padding: '8px', 
-                                                textAlign: 'center', 
+                                            <th style={{
+                                                padding: '8px',
+                                                textAlign: 'center',
                                                 fontWeight: '600',
                                                 border: '1px solid #dee2e6'
                                             }}>Billed</th>
@@ -1195,23 +1581,23 @@ const GRN = () => {
                                         {itemAllocationData.map((row, index) => (
                                             <React.Fragment key={index}>
                                                 {/* Tracking and Order Info Row */}
-                                                <tr style={{ 
+                                                <tr style={{
                                                     backgroundColor: '#f8f9fa',
                                                     border: '2px solid #dee2e6'
                                                 }}>
-                                                    <td colSpan="9" style={{ 
+                                                    <td colSpan="9" style={{
                                                         padding: '8px 12px',
                                                         border: '1px solid #dee2e6',
                                                         fontSize: '13px'
                                                     }}>
                                                         <div className="row align-items-center">
                                                             <div className="col-md-3">
-                                                                <span style={{ 
+                                                                <span style={{
                                                                     fontStyle: 'italic',
                                                                     fontWeight: '500',
                                                                     color: '#495057'
                                                                 }}>
-                                                                    Tracking No. : 
+                                                                    Tracking No. :
                                                                 </span>
                                                                 <select
                                                                     className="form-control form-control-sm d-inline-block py-1 px-2"
@@ -1230,12 +1616,12 @@ const GRN = () => {
                                                                 </select>
                                                             </div>
                                                             <div className="col-md-3">
-                                                                <span style={{ 
+                                                                <span style={{
                                                                     fontStyle: 'italic',
                                                                     fontWeight: '500',
                                                                     color: '#495057'
                                                                 }}>
-                                                                    Order No. : 
+                                                                    Order No. :
                                                                 </span>
                                                                 <select
                                                                     className="form-control form-control-sm d-inline-block py-1 px-2"
@@ -1257,11 +1643,11 @@ const GRN = () => {
                                                     </td>
                                                 </tr>
                                                 {/* Data Row */}
-                                                <tr style={{ 
+                                                <tr style={{
                                                     backgroundColor: index % 2 === 0 ? '#ffffff' : '#f8f9fa',
                                                     border: '2px solid #dee2e6'
                                                 }}>
-                                                    <td style={{ 
+                                                    <td style={{
                                                         padding: '10px',
                                                         border: '1px solid #dee2e6',
                                                         textAlign: 'center'
@@ -1271,15 +1657,15 @@ const GRN = () => {
                                                             className="form-control form-control-sm"
                                                             value={row.godown}
                                                             onChange={(e) => handleItemAllocationChange(index, 'godown', e.target.value)}
-                                                            style={{ 
-                                                                border: '1px solid #ced4da', 
+                                                            style={{
+                                                                border: '1px solid #ced4da',
                                                                 textAlign: 'center',
                                                                 fontSize: '13px',
                                                                 padding: '4px 8px'
                                                             }}
                                                         />
                                                     </td>
-                                                    <td style={{ 
+                                                    <td style={{
                                                         padding: '10px',
                                                         border: '1px solid #dee2e6',
                                                         textAlign: 'center'
@@ -1289,15 +1675,15 @@ const GRN = () => {
                                                             className="form-control form-control-sm"
                                                             value={row.batchLotNo}
                                                             onChange={(e) => handleItemAllocationChange(index, 'batchLotNo', e.target.value)}
-                                                            style={{ 
-                                                                border: '1px solid #ced4da', 
+                                                            style={{
+                                                                border: '1px solid #ced4da',
                                                                 textAlign: 'center',
                                                                 fontSize: '13px',
                                                                 padding: '4px 8px'
                                                             }}
                                                         />
                                                     </td>
-                                                    <td style={{ 
+                                                    <td style={{
                                                         padding: '10px',
                                                         border: '1px solid #dee2e6',
                                                         textAlign: 'center'
@@ -1307,15 +1693,15 @@ const GRN = () => {
                                                             className="form-control form-control-sm"
                                                             value={row.quantityActual}
                                                             onChange={(e) => handleItemAllocationChange(index, 'quantityActual', e.target.value)}
-                                                            style={{ 
-                                                                border: '1px solid #ced4da', 
+                                                            style={{
+                                                                border: '1px solid #ced4da',
                                                                 textAlign: 'center',
                                                                 fontSize: '13px',
                                                                 padding: '4px 8px'
                                                             }}
                                                         />
                                                     </td>
-                                                    <td style={{ 
+                                                    <td style={{
                                                         padding: '10px',
                                                         border: '1px solid #dee2e6',
                                                         textAlign: 'center'
@@ -1325,15 +1711,15 @@ const GRN = () => {
                                                             className="form-control form-control-sm"
                                                             value={row.quantityBilled}
                                                             onChange={(e) => handleItemAllocationChange(index, 'quantityBilled', e.target.value)}
-                                                            style={{ 
-                                                                border: '1px solid #ced4da', 
+                                                            style={{
+                                                                border: '1px solid #ced4da',
                                                                 textAlign: 'center',
                                                                 fontSize: '13px',
                                                                 padding: '4px 8px'
                                                             }}
                                                         />
                                                     </td>
-                                                    <td style={{ 
+                                                    <td style={{
                                                         padding: '10px',
                                                         border: '1px solid #dee2e6',
                                                         textAlign: 'center'
@@ -1342,8 +1728,8 @@ const GRN = () => {
                                                             className="form-control form-control-sm"
                                                             value={row.qcTest}
                                                             onChange={(e) => handleItemAllocationChange(index, 'qcTest', e.target.value)}
-                                                            style={{ 
-                                                                border: '1px solid #ced4da', 
+                                                            style={{
+                                                                border: '1px solid #ced4da',
                                                                 textAlign: 'center',
                                                                 fontSize: '13px',
                                                                 padding: '4px 8px'
@@ -1353,7 +1739,7 @@ const GRN = () => {
                                                             <option value="Yes">Yes</option>
                                                         </select>
                                                     </td>
-                                                    <td style={{ 
+                                                    <td style={{
                                                         padding: '10px',
                                                         border: '1px solid #dee2e6',
                                                         textAlign: 'center'
@@ -1362,8 +1748,8 @@ const GRN = () => {
                                                             className="form-control form-control-sm"
                                                             value={row.qcNo}
                                                             onChange={(e) => handleItemAllocationChange(index, 'qcNo', e.target.value)}
-                                                            style={{ 
-                                                                border: '1px solid #ced4da', 
+                                                            style={{
+                                                                border: '1px solid #ced4da',
                                                                 textAlign: 'center',
                                                                 fontSize: '13px',
                                                                 padding: '4px 8px'
@@ -1373,7 +1759,7 @@ const GRN = () => {
                                                             <option value="Yes">Yes</option>
                                                         </select>
                                                     </td>
-                                                    <td style={{ 
+                                                    <td style={{
                                                         padding: '10px',
                                                         border: '1px solid #dee2e6',
                                                         textAlign: 'center'
@@ -1383,15 +1769,15 @@ const GRN = () => {
                                                             className="form-control form-control-sm"
                                                             value={row.qcDate}
                                                             onChange={(e) => handleItemAllocationChange(index, 'qcDate', e.target.value)}
-                                                            style={{ 
-                                                                border: '1px solid #ced4da', 
+                                                            style={{
+                                                                border: '1px solid #ced4da',
                                                                 textAlign: 'center',
                                                                 fontSize: '13px',
                                                                 padding: '4px 8px'
                                                             }}
                                                         />
                                                     </td>
-                                                    <td style={{ 
+                                                    <td style={{
                                                         padding: '10px',
                                                         border: '1px solid #dee2e6',
                                                         textAlign: 'center'
@@ -1401,15 +1787,15 @@ const GRN = () => {
                                                             className="form-control form-control-sm"
                                                             value={row.inspectionObservation}
                                                             onChange={(e) => handleItemAllocationChange(index, 'inspectionObservation', e.target.value)}
-                                                            style={{ 
-                                                                border: '1px solid #ced4da', 
+                                                            style={{
+                                                                border: '1px solid #ced4da',
                                                                 textAlign: 'center',
                                                                 fontSize: '13px',
                                                                 padding: '4px 8px'
                                                             }}
                                                         />
                                                     </td>
-                                                    <td style={{ 
+                                                    <td style={{
                                                         padding: '10px',
                                                         border: '1px solid #dee2e6',
                                                         textAlign: 'center'
@@ -1419,45 +1805,46 @@ const GRN = () => {
                                                             className="form-control form-control-sm"
                                                             value={row.insDate}
                                                             onChange={(e) => handleItemAllocationChange(index, 'insDate', e.target.value)}
-                                                            style={{ 
-                                                                border: '1px solid #ced4da', 
+                                                            style={{
+                                                                border: '1px solid #ced4da',
                                                                 textAlign: 'center',
                                                                 fontSize: '13px',
                                                                 padding: '4px 8px'
                                                             }}
                                                         />
                                                     </td>
-                                                    <td style={{ 
+                                                    <td style={{
                                                         padding: '10px',
-                                                        border: '1px solid #dee2e6'}}>
-                                                            <div className="d-flex gap-2">
-                                                                    <Button
-                                                                        variant="outline-danger"
-                                                                        size="sm"
-                                                                        onClick={() => removeItemAllocationRow(index)}
-                                                                        disabled={itemAllocationData.length === 1}
-                                                                        style={{
-                                                                            padding: '4px 8px',
-                                                                            fontSize: '12px'
-                                                                        }}
-                                                                    >
-                                                                        <i className="fas fa-trash"></i>
-                                                                    </Button>
-                                                                    {index === itemAllocationData.length - 1 && (
-                                                                        <Button
-                                                                            variant="primary"
-                                                                            size="sm"
-                                                                            onClick={addNewItemAllocationRow}
-                                                                            style={{
-                                                                                padding: '4px 8px',
-                                                                                fontSize: '12px'
-                                                                            }}
-                                                                        >
-                                                                            <i className="fas fa-plus"></i>
-                                                                        </Button>
-                                                                    )}
-                                                                </div>
-                                                        </td>
+                                                        border: '1px solid #dee2e6'
+                                                    }}>
+                                                        <div className="d-flex gap-2">
+                                                            <Button
+                                                                variant="outline-danger"
+                                                                size="sm"
+                                                                onClick={() => removeItemAllocationRow(index)}
+                                                                disabled={itemAllocationData.length === 1}
+                                                                style={{
+                                                                    padding: '4px 8px',
+                                                                    fontSize: '12px'
+                                                                }}
+                                                            >
+                                                                <i className="fas fa-trash"></i>
+                                                            </Button>
+                                                            {index === itemAllocationData.length - 1 && (
+                                                                <Button
+                                                                    variant="primary"
+                                                                    size="sm"
+                                                                    onClick={addNewItemAllocationRow}
+                                                                    style={{
+                                                                        padding: '4px 8px',
+                                                                        fontSize: '12px'
+                                                                    }}
+                                                                >
+                                                                    <i className="fas fa-plus"></i>
+                                                                </Button>
+                                                            )}
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             </React.Fragment>
                                         ))}

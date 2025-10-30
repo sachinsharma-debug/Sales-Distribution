@@ -21,9 +21,6 @@ export default function WarehouseTransaction() {
                             <div className="org-header">Warehouse Transaction</div>
                             <div className="org-list">
                                 <Link to="/GRN-Page"><div className="org-tab">GRN</div></Link>
-                                <Link to="/SalesQuotation"><div className="org-tab">GRN Expense Entry</div></Link>
-                                <Link to="/GoodsReceipt"><div className="org-tab">Goods Receipt</div></Link>
-                                <Link to="/GoodsReject"><div className="org-tab">Goods Rejection</div></Link>
                                 <Link to="/StockJournal"><div className="org-tab">Stock Journal</div></Link>
                                 <Link to="/MaterialTransfer"><div className="org-tab">Material Transfer</div></Link>
                                 <Link to="/PurchaseRequisition"><div className="org-tab">Purchase Requisition</div></Link>

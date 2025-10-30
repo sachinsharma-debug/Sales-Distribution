@@ -71,7 +71,6 @@ const StockItem = () => {
   });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [maintainBatches, setMaintainBatches] = useState("No");
   const [assemblyStepsDialog, setAssemblyStepsDialog] = useState(false);
   const [assemblySteps, setAssemblySteps] = useState([
     { id: 1, process: "Assembling", subProcess: "", cycleTimeMinutes: "0" },
@@ -80,6 +79,15 @@ const StockItem = () => {
   const [bomName, setBomName] = useState("");
   // Basic tab - Stock Name for referencing in BOM config
   const [stockName, setStockName] = useState("");
+
+  // Additional Details Tab state
+  const [additionalDetails, setAdditionalDetails] = useState({
+    maintainBatches: false,
+    trackDateManufacturing: false,
+    useExpiryDates: false,
+    alterComponentsBOM: false,
+    setAlterAssemblySteps: false,
+  });
 
   // Advanced Features state
   const [advancedFeatures, setAdvancedFeatures] = useState({
@@ -398,20 +406,23 @@ const StockItem = () => {
   };
 
   const addBomItem = () => {
-    setBomItems((prev) => [
-      ...prev,
-      {
-        id: prev.length ? Math.max(...prev.map((r) => r.id)) + 1 : 1,
-        process: "",
-        item: "",
-        godown: "",
-        subType: "",
-        quantity: "",
-        wastageDetails: "No",
-        budgetRate: "",
-        vendorName: "",
-      },
-    ]);
+    setBomItems((prev) => {
+      const maxId = prev.length > 0 ? Math.max(...prev.map((r) => r.id)) : 0;
+      return [
+        ...prev,
+        {
+          id: maxId + 1,
+          process: "",
+          item: "",
+          godown: "",
+          subType: "",
+          quantity: "",
+          wastageDetails: "No",
+          budgetRate: "",
+          vendorName: "",
+        },
+      ];
+    });
   };
 
   const updateBomItem = (id, field, value) => {
@@ -439,6 +450,14 @@ const StockItem = () => {
   // Handle advanced features toggle
   const handleAdvancedFeatureToggle = (feature) => {
     setAdvancedFeatures((prev) => ({
+      ...prev,
+      [feature]: !prev[feature],
+    }));
+  };
+
+  // Handle additional details toggle
+  const handleAdditionalDetailsToggle = (feature) => {
+    setAdditionalDetails((prev) => ({
       ...prev,
       [feature]: !prev[feature],
     }));
@@ -1039,7 +1058,8 @@ const StockItem = () => {
                         {advancedFeatures.setAlterImageForStockItem && (
                           <button
                             type="button"
-                            className="btn btn-outline-primary btn-sm"
+                            className="btn btn-outline-primary"
+                            style={{ fontSize: "0.65rem", padding: "2px 8px" }}
                             onClick={() =>
                               handleAdvancedFeatureSet(
                                 "setAlterImageForStockItem"
@@ -1076,7 +1096,8 @@ const StockItem = () => {
                         {advancedFeatures.setAlterPackingInfo && (
                           <button
                             type="button"
-                            className="btn btn-outline-primary btn-sm"
+                            className="btn btn-outline-primary"
+                            style={{ fontSize: "0.65rem", padding: "2px 8px" }}
                             onClick={() =>
                               handleAdvancedFeatureSet("setAlterPackingInfo")
                             }
@@ -1113,7 +1134,8 @@ const StockItem = () => {
                         {advancedFeatures.setAlterInwardLocation && (
                           <button
                             type="button"
-                            className="btn btn-outline-primary btn-sm"
+                            className="btn btn-outline-primary"
+                            style={{ fontSize: "0.65rem", padding: "2px 8px" }}
                             onClick={() =>
                               handleAdvancedFeatureSet("setAlterInwardLocation")
                             }
@@ -1150,7 +1172,8 @@ const StockItem = () => {
                         {advancedFeatures.setAlterLocationWiseROL && (
                           <button
                             type="button"
-                            className="btn btn-outline-primary btn-sm"
+                            className="btn btn-outline-primary"
+                            style={{ fontSize: "0.65rem", padding: "2px 8px" }}
                             onClick={() =>
                               handleAdvancedFeatureSet(
                                 "setAlterLocationWiseROL"
@@ -1189,7 +1212,8 @@ const StockItem = () => {
                         {advancedFeatures.setAlterPartyWiseItemCode && (
                           <button
                             type="button"
-                            className="btn btn-outline-primary btn-sm"
+                            className="btn btn-outline-primary"
+                            style={{ fontSize: "0.65rem", padding: "2px 8px" }}
                             onClick={() =>
                               handleAdvancedFeatureSet(
                                 "setAlterPartyWiseItemCode"
@@ -1230,7 +1254,8 @@ const StockItem = () => {
                         {advancedFeatures.setAlterVoucherTypeWiseItem && (
                           <button
                             type="button"
-                            className="btn btn-outline-primary btn-sm"
+                            className="btn btn-outline-primary"
+                            style={{ fontSize: "0.65rem", padding: "2px 8px" }}
                             onClick={() =>
                               handleAdvancedFeatureSet(
                                 "setAlterVoucherTypeWiseItem"
@@ -1269,7 +1294,8 @@ const StockItem = () => {
                         {advancedFeatures.setAlterQCSpecification && (
                           <button
                             type="button"
-                            className="btn btn-outline-primary btn-sm"
+                            className="btn btn-outline-primary"
+                            style={{ fontSize: "0.65rem", padding: "2px 8px" }}
                             onClick={() =>
                               handleAdvancedFeatureSet(
                                 "setAlterQCSpecification"
@@ -1302,7 +1328,8 @@ const StockItem = () => {
                         {advancedFeatures.otherInfo && (
                           <button
                             type="button"
-                            className="btn btn-outline-primary btn-sm"
+                            className="btn btn-outline-primary"
+                            style={{ fontSize: "0.65rem", padding: "2px 8px" }}
                             onClick={() =>
                               handleAdvancedFeatureSet("otherInfo")
                             }
@@ -1779,8 +1806,12 @@ const StockItem = () => {
                                   "Yes" && (
                                   <button
                                     type="button"
-                                    className="btn btn-outline-primary btn-sm"
-                                    style={{ marginLeft: "8px" }}
+                                    className="btn btn-outline-primary"
+                                    style={{
+                                      marginLeft: "8px",
+                                      fontSize: "0.65rem",
+                                      padding: "2px 8px",
+                                    }}
                                     onClick={() => {
                                       setPrimaryPackingInfoDialogOpen(true);
                                     }}
@@ -1889,8 +1920,12 @@ const StockItem = () => {
                                 {packingInfo.masterPackingEnabled === "Yes" && (
                                   <button
                                     type="button"
-                                    className="btn btn-outline-primary btn-sm"
-                                    style={{ marginLeft: "8px" }}
+                                    className="btn btn-outline-primary"
+                                    style={{
+                                      marginLeft: "8px",
+                                      fontSize: "0.65rem",
+                                      padding: "2px 8px",
+                                    }}
                                     onClick={() => {
                                       setMasterPackingInfoDialogOpen(true);
                                     }}
@@ -3297,7 +3332,8 @@ const StockItem = () => {
                       {setPartyWiseSpecification === "Yes" && (
                         <button
                           type="button"
-                          className="btn btn-outline-primary btn-sm ms-3"
+                          className="btn btn-outline-primary ms-3"
+                          style={{ fontSize: "0.65rem", padding: "2px 8px" }}
                           onClick={() =>
                             setPartyWiseSpecificationDialogOpen(true)
                           }
@@ -3408,7 +3444,11 @@ const StockItem = () => {
                               {row.setAlterSpecification === "Yes" && (
                                 <button
                                   type="button"
-                                  className="btn btn-outline-primary btn-sm"
+                                  className="btn btn-outline-primary"
+                                  style={{
+                                    fontSize: "0.65rem",
+                                    padding: "2px 8px",
+                                  }}
                                   onClick={() => openPartySpecDialog(row.id)}
                                 >
                                   Set
@@ -3467,19 +3507,23 @@ const StockItem = () => {
                           Maintain in batches
                         </label>
                       </div>
-                      <div className="col-8">
-                        <select
-                          id="MaintainBatches"
-                          className="form-select w-100"
-                          value={maintainBatches}
-                          onChange={(e) => setMaintainBatches(e.target.value)}
-                        >
-                          <option value="Yes">Yes</option>
-                          <option value="No">No</option>
-                        </select>
+                      <div className="col-8 d-flex align-items-center">
+                        <div className="form-check form-switch me-2">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            checked={additionalDetails.maintainBatches}
+                            onChange={() =>
+                              handleAdditionalDetailsToggle("maintainBatches")
+                            }
+                          />
+                          <label className="form-check-label">
+                            {additionalDetails.maintainBatches ? "Yes" : "No"}
+                          </label>
+                        </div>
                       </div>
 
-                      {maintainBatches === "Yes" && (
+                      {additionalDetails.maintainBatches && (
                         <>
                           <div
                             className="col-4 my-auto"
@@ -3492,14 +3536,26 @@ const StockItem = () => {
                               Track date of manufacturing
                             </label>
                           </div>
-                          <div className="col-8">
-                            <select
-                              id="TrackDateManufacturing"
-                              className="form-select w-100"
-                            >
-                              <option value="Yes">Yes</option>
-                              <option value="No">No</option>
-                            </select>
+                          <div className="col-8 d-flex align-items-center">
+                            <div className="form-check form-switch me-2">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={
+                                  additionalDetails.trackDateManufacturing
+                                }
+                                onChange={() =>
+                                  handleAdditionalDetailsToggle(
+                                    "trackDateManufacturing"
+                                  )
+                                }
+                              />
+                              <label className="form-check-label">
+                                {additionalDetails.trackDateManufacturing
+                                  ? "Yes"
+                                  : "No"}
+                              </label>
+                            </div>
                           </div>
 
                           <div
@@ -3513,14 +3569,24 @@ const StockItem = () => {
                               Use expiry dates
                             </label>
                           </div>
-                          <div className="col-8">
-                            <select
-                              id="UseExpiryDates"
-                              className="form-select w-100"
-                            >
-                              <option value="No">No</option>
-                              <option value="Yes">Yes</option>
-                            </select>
+                          <div className="col-8 d-flex align-items-center">
+                            <div className="form-check form-switch me-2">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={additionalDetails.useExpiryDates}
+                                onChange={() =>
+                                  handleAdditionalDetailsToggle(
+                                    "useExpiryDates"
+                                  )
+                                }
+                              />
+                              <label className="form-check-label">
+                                {additionalDetails.useExpiryDates
+                                  ? "Yes"
+                                  : "No"}
+                              </label>
+                            </div>
                           </div>
                         </>
                       )}
@@ -3533,18 +3599,34 @@ const StockItem = () => {
                           Alter Components (BOM)
                         </label>
                       </div>
-                      <div className="col-8">
-                        <select
-                          id="AlterComponentsBOM"
-                          className="form-select w-100"
-                          onChange={(e) => {
-                            if (e.target.value === "Yes")
-                              setBomDialogOpen(true);
-                          }}
-                        >
-                          <option value="No">No</option>
-                          <option value="Yes">Yes</option>
-                        </select>
+                      <div className="col-8 d-flex align-items-center">
+                        <div className="form-check form-switch me-2">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            checked={additionalDetails.alterComponentsBOM}
+                            onChange={() =>
+                              handleAdditionalDetailsToggle(
+                                "alterComponentsBOM"
+                              )
+                            }
+                          />
+                          <label className="form-check-label">
+                            {additionalDetails.alterComponentsBOM
+                              ? "Yes"
+                              : "No"}
+                          </label>
+                        </div>
+                        {additionalDetails.alterComponentsBOM && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary"
+                            style={{ fontSize: "0.65rem", padding: "2px 8px" }}
+                            onClick={() => setBomDialogOpen(true)}
+                          >
+                            Set
+                          </button>
+                        )}
                       </div>
 
                       <div className="col-4 my-auto">
@@ -3555,17 +3637,34 @@ const StockItem = () => {
                           Set/Alter Assembly Steps
                         </label>
                       </div>
-                      <div className="col-8">
-                        <select
-                          id="SetAlterAssemblySteps"
-                          className="form-select w-100"
-                          onChange={(e) =>
-                            handleAssemblyStepsChange(e.target.value)
-                          }
-                        >
-                          <option value="No">No</option>
-                          <option value="Yes">Yes</option>
-                        </select>
+                      <div className="col-8 d-flex align-items-center">
+                        <div className="form-check form-switch me-2">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            checked={additionalDetails.setAlterAssemblySteps}
+                            onChange={() =>
+                              handleAdditionalDetailsToggle(
+                                "setAlterAssemblySteps"
+                              )
+                            }
+                          />
+                          <label className="form-check-label">
+                            {additionalDetails.setAlterAssemblySteps
+                              ? "Yes"
+                              : "No"}
+                          </label>
+                        </div>
+                        {additionalDetails.setAlterAssemblySteps && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary"
+                            style={{ fontSize: "0.65rem", padding: "2px 8px" }}
+                            onClick={() => setAssemblyStepsDialog(true)}
+                          >
+                            Set
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -4170,7 +4269,7 @@ const StockItem = () => {
                           type="button"
                           className="btn btn-danger btn-sm"
                           onClick={() => deleteBomItem(row.id)}
-                          disabled={bomItems.length === 1}
+                          disabled={bomItems.length <= 1}
                         >
                           Delete
                         </button>

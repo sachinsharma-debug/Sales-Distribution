@@ -30,8 +30,8 @@ import Brand from "./pages/Inventory/Brand";
 import ItemMasterCondition from "./pages/Settings/ItemMasterCondition";
 import Features from "./pages/Settings/Features";
 import StockItem from "./pages/Inventory/StockItem";
-import SalesEnquiry from "./pages/Settings/SalesEnquiry";
-import SalesQuotation from "./pages/Settings/SalesQuotation";
+// import SalesEnquiry from "./pages/Settings/SalesEnquiry";
+// import SalesQuotation from "./pages/Settings/SalesQuotation";
 import PurchaseEnquiry from "./pages/Settings/PurchaseEnquiry";
 import AccountsLedger from "./pages/Accounts/AccountsLedger";
 import Accounts from "./pages/Accounts/Accounts";
@@ -79,8 +79,12 @@ import OCAnalysis from "./pages/Quality Control/OCAnalysis";
 import IncomingRMInspectionRegister from "./pages/Quality Control/IncomingRMInspectionRegister";
 import RejectionGraph from "./pages/Quality Control/RejectionGraph";
 import TestReportRegister from "./pages/Quality Control/TestReportRegister";
-import UpdateItem from "./pages/Quality Control/UpdateItem";
-import UpdateMultiItem from "./pages/Quality Control/UpdateMultiItem";
+import MaterialTransfer from "./pages/Warehouse Transaction/MaterialTransfer";
+
+import Salesmanagement from "./pages/Sales Management/salesmanagement";
+import SalesOrder from "./pages/Sales Management/SalesOrder";
+import SalesEnquiry from "./pages/Sales Management/SalesEnquiry";
+import SalesQuotation from "./pages/Sales Management/SalesQuotation";
 
 
 // Main layout component that includes Sidebar and Header
@@ -170,17 +174,16 @@ function App() {
           <Route path="/fginward-inspection" element={<FGInwardInspection />} />
           <Route path="/test-report" element={<TestReport />} />
           <Route path="/oc-analysis" element={<OCAnalysis />} />
-          <Route
-            path="/incoming-rm-inspection-register"
-            element={<IncomingRMInspectionRegister />}
-          />
+          <Route path="/incoming-rm-inspection-register" element={<IncomingRMInspectionRegister />}/>
           <Route path="/rejection-graph" element={<RejectionGraph />} />
-          <Route
-            path="/test-report-register"
-            element={<TestReportRegister />}
-          />
-          <Route path="/update-item" element={<UpdateItem />} />
-          <Route path="/update-multi-item" element={<UpdateMultiItem />} />
+          <Route path="/test-report-register" element={<TestReportRegister />}/>
+          <Route path="/MaterialTransfer" element={<MaterialTransfer />} />
+
+
+          <Route path="/salesmanagement" element={<Salesmanagement />} />
+          <Route path="/salesEnquiry" element={<SalesEnquiry />} />
+          <Route path="/salesQuotation" element={<SalesQuotation />} />
+          <Route path="/salesorder" element={<SalesOrder />} />
 
           {/* Add other protected routes here */}
         </Route>

@@ -41,21 +41,13 @@
 //         </div>
 //       </div>
 //     </div>
-    
+
 //     </>
-    
-    
+
 //   );
 // };
 
 // export default Dashboard;
-
-
-
-
-
-
-
 
 import React from "react";
 import DashboardCard from "../../component/DashboradCard";
@@ -68,9 +60,7 @@ const DashboardCard1 = () => {
     { title: "Ledgers", count: 2 },
   ];
 
-  const submissionItems = [
-    { title: "Purchase Invoice", count: 1 },
-  ];
+  const submissionItems = [{ title: "Purchase Invoice", count: 1 }];
 
   return (
     // <div className="dashboard-page">
@@ -93,20 +83,28 @@ const DashboardCard1 = () => {
     //   </div>
     // </div>
     <div className="settings-content">
-    <div className="heading">Transaction</div>
-    <div className="row">
+      <div className="heading">Dashboard</div>
+      <div className="row">
         <div className="col-3">
-            <div className="simple-org-container">
-                <div className="org-header">Transaction</div>
-                <div className="org-list">
-                    <Link to="/salesEnquiry"><div className="org-tab">Sales Enquiry</div></Link>
-                    <Link to="/SalesQuotation"><div className="org-tab">Sales Quotation</div></Link>
-                    <Link to="/taxation"><div className="org-tab">Sales Order</div></Link>
-                    <Link to="/branches"><div className="org-tab">Sales Confirmaton</div></Link>
-                </div>
-            </div>
+          <div className="simple-org-container">
+            {/* <div className="org-header">Transaction</div> */}
+            {/* <div className="org-list">
+              <Link to="/salesEnquiry">
+                <div className="org-tab">Sales Enquiry</div>
+              </Link>
+              <Link to="/SalesQuotation">
+                <div className="org-tab">Sales Quotation</div>
+              </Link>
+              <Link to="/taxation">
+                <div className="org-tab">Sales Order</div>
+              </Link>
+              <Link to="/branches">
+                <div className="org-tab">Sales Confirmaton</div>
+              </Link>
+            </div> */}
+          </div>
         </div>
-    </div>
+      </div>
     </div>
   );
 };

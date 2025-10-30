@@ -56,6 +56,7 @@ function Sidebar() {
     { icon: '🧾', label: 'Reports' },
     { icon: '📦', label: 'Warehouse Transaction', path: '/WarehouseTransaction' },
     { icon: "🔍", label: "Quality Control", path: "/QualityControl" },
+    { icon: "💼", label: "Sales Management", path: "/salesmanagement" },
     { icon: '🛒', label: 'Indent', path: '/Indent-Management' },
     // { icon: '🛒', label: 'Sales' },
     // { icon: '👥', label: 'Users' },

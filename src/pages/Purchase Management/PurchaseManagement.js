@@ -12,7 +12,7 @@ export default function PurchaseManagement() {
                             <div className="org-header">Purchase Management</div>
                             <div className="org-list">
                                 <Link to="/PurchaseEnquiry"><div className="org-tab">Purchase Enquiry</div></Link>
-                                <Link to="/PoCapital"><div className="org-tab">PO Capital</div></Link>
+                                <Link to="/PoCapital"><div className="org-tab">Purchase Order</div></Link>
                             </div>
                         </div>
                     </div>
